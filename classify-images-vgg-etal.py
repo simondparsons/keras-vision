@@ -1,7 +1,7 @@
-# classify-images-vgg.py
+# classify-images-vgg-etal.py
 #
 # Simon Parsons
-# 25-05-13
+# 26-01-19
 #
 # Code to explore the performance of some of the deeper early CNN
 # architectures using data from some of the TensorFlow datasets.
@@ -10,8 +10,10 @@
 # https://exowanderer.medium.com/what-is-this-keras-thing-anyways-fe7aa00158ef
 #
 # but modified to call different networks and to use command line
-# arguments. 
+# arguments.
 #
+# This is a pretty minor edit of classify-images-keras.py from my
+# basic-vision repo.
 
 import string
 import argparse
@@ -23,8 +25,8 @@ from tensorflow.keras import layers, callbacks, utils, datasets, models
 from operator import itemgetter
 # These are the architectures available roughly in order of complexity.
 from models.vgg11 import VGG11
-from models.vgg19 import VGG19
 #from models.vgg16 import VGG16
+from models.vgg19 import VGG19
 
 def main():
     # Generalise the code by allowing the model, dataset and some of the
@@ -33,7 +35,7 @@ def main():
     # Possible values: mnist, fashion_mnist, cifar10
     parser.add_argument('--dataset', help='Which datset to use.', default='mnist')
     # Possible values: many, see the README.md in the models folder
-    parser.add_argument('--model', help='Which model to use.', default='LeNet')
+    parser.add_argument('--model', help='Which model to use.', default='VGG11')
     # Possible values: y or yes for display, anothing else for no display
     parser.add_argument('--display', help='Display training data?', default='n')
     # Use epochs to specify a number to run without early stopping. If
