@@ -45,12 +45,12 @@ class VGG19(Backbone):
             )
         )
         # Resize images to 224 x 224
-        self.model.add(
-            layers.Resizing(
-                height = 224,
-                width = 224
-            )
-        )
+        #self.model.add(
+        #    layers.Resizing(
+        #        height = 224,
+        #        width = 224
+        #    )
+        #)
         # Add a rescaling layer to convert the inputs to fall in the range (-1, 1).
         # https://machinelearningmastery.com/image-augmentation-with-keras-preprocessing-layers-and-tf-image/
         self.model.add(
@@ -301,7 +301,7 @@ class VGG19(Backbone):
         # Feed through fully connected layers.
         self.model.add(
             layers.Dense(
-                units= 120 # 4096
+                units= 120, # 4096
                 activation=self.activation,
                 name="First_Dense_layer"
             )
@@ -316,7 +316,7 @@ class VGG19(Backbone):
         )
         self.model.add(
             layers.Dense(
-                units= 84 # 4096
+                units= 84, # 4096
                 activation=self.activation,
                 name="Second_Dense_layer"
             )

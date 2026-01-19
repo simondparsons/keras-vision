@@ -13,7 +13,7 @@
 from models.backbone import Backbone 
 from tensorflow.keras import layers, models
 
-class VGG19(Backbone):
+class VGG16(Backbone):
 
     # Set up some constants that we will use to do this across the various
     # layers.
@@ -31,7 +31,7 @@ class VGG19(Backbone):
     nfilters_hidden5 = 512
 
     # Define how we will build the model
-    model = models.Sequential(name='VGG19')
+    model = models.Sequential(name='VGG16')
 
     def buildModel(self):
         # Pre-processing
@@ -45,12 +45,12 @@ class VGG19(Backbone):
             )
         )
         # Resize images to 224 x 224
-        self.model.add(
-            layers.Resizing(
-                height = 224,
-                width = 224
-            )
-        )
+        #self.model.add(
+        #    layers.Resizing(
+        #        height = 224,
+        #        width = 224
+        #    )
+        #)
         # Add a rescaling layer to convert the inputs to fall in the range (-1, 1).
         # https://machinelearningmastery.com/image-augmentation-with-keras-preprocessing-layers-and-tf-image/
         self.model.add(
@@ -271,7 +271,7 @@ class VGG19(Backbone):
         # Feed through fully connected layers.
         self.model.add(
             layers.Dense(
-                units= 120 # 4096, # 2 classes
+                units= 120, # 4096, # 2 classes
                 activation=self.activation,
                 name="First_Dense_layer"
             )
@@ -286,7 +286,7 @@ class VGG19(Backbone):
         )
         self.model.add(
             layers.Dense(
-                units=84 # 4096, # 2 classes
+                units=84, # 4096, # 2 classes
                 activation=self.activation,
                 name="Second_Dense_layer"
             )

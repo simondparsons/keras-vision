@@ -25,7 +25,7 @@ from tensorflow.keras import layers, callbacks, utils, datasets, models
 from operator import itemgetter
 # These are the architectures available roughly in order of complexity.
 from models.vgg11 import VGG11
-#from models.vgg16 import VGG16
+from models.vgg16 import VGG16
 from models.vgg19 import VGG19
 
 def main():
