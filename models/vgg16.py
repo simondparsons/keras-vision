@@ -1,9 +1,9 @@
-# vgg19.py
+# vgg16.py
 #
 # Starting from:
 # https://exowanderer.medium.com/what-is-this-keras-thing-anyways-fe7aa00158ef
 #
-# tries to implement the VGG19 classifier of ImageNet fame, based on:
+# tries to implement the VGG16 classifier from:
 #
 # K. Simonyan & A, Zisserman Very Deep Convolutional Networks for
 # Large-scale Image Recognition, 3rd International Conference on
@@ -133,7 +133,7 @@ class VGG19(Backbone):
             )
         )
 
-        # Now four convolution layers with 256 filters
+        # Now three convolution layers with 256 filters
         self.model.add(
             layers.Conv2D(
                 filters=self.nfilters_hidden3,
@@ -164,17 +164,7 @@ class VGG19(Backbone):
                 name='Convolution_Layer_33'
             )
         )
-        self.model.add(
-            layers.Conv2D(
-                filters=self.nfilters_hidden3,
-                kernel_size=self.kernel_shape,
-                activation=self.activation,
-                padding=self.padding,
-                strides=self.strides,
-                name='Convolution_Layer_34'
-            )
-        )
-        # Batch normalization
+      # Batch normalization
         self.model.add(
             layers.BatchNormalization(
                 name='Batch_Norm_Layer_3'
@@ -188,7 +178,7 @@ class VGG19(Backbone):
             )
         )
 
-        # Now four convolution layers with 512 filters
+        # Now three convolution layers with 512 filters
         self.model.add(
             layers.Conv2D(
                 filters=self.nfilters_hidden4,
@@ -219,17 +209,7 @@ class VGG19(Backbone):
                 name='Convolution_Layer_43'
             )
         )
-        self.model.add(
-            layers.Conv2D(
-                filters=self.nfilters_hidden4,
-                kernel_size=self.kernel_shape,
-                activation=self.activation,
-                padding=self.padding,
-                strides=self.strides,
-                name='Convolution_Layer_44'
-            )
-        )
-        # Batch normalization
+       # Batch normalization
         self.model.add(
             layers.BatchNormalization(
                 name='Batch_Norm_Layer_4'
@@ -243,7 +223,7 @@ class VGG19(Backbone):
             )
         )
         
-        # Another four convolution layers with 512 filters
+        # Another three convolution layers with 512 filters
         self.model.add(
             layers.Conv2D(
                 filters=self.nfilters_hidden5,
@@ -274,16 +254,6 @@ class VGG19(Backbone):
                 name='Convolution_Layer_53'
             )
         )
-        self.model.add(
-            layers.Conv2D(
-                filters=self.nfilters_hidden5,
-                kernel_size=self.kernel_shape,
-                activation=self.activation,
-                padding=self.padding,
-                strides=self.strides,
-                name='Convolution_Layer_54'
-            )
-        )
         # Batch normalization
         self.model.add(
             layers.BatchNormalization(
@@ -301,7 +271,7 @@ class VGG19(Backbone):
         # Feed through fully connected layers.
         self.model.add(
             layers.Dense(
-                units= 120 # 4096
+                units= 120 # 4096, # 2 classes
                 activation=self.activation,
                 name="First_Dense_layer"
             )
@@ -316,7 +286,7 @@ class VGG19(Backbone):
         )
         self.model.add(
             layers.Dense(
-                units= 84 # 4096
+                units=84 # 4096, # 2 classes
                 activation=self.activation,
                 name="Second_Dense_layer"
             )
