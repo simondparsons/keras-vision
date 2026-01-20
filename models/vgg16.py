@@ -1,5 +1,8 @@
 # vgg16.py
 #
+# Simon Parsons
+# 26-01-20
+#
 # Starting from:
 # https://exowanderer.medium.com/what-is-this-keras-thing-anyways-fe7aa00158ef
 #
@@ -7,8 +10,7 @@
 #
 # K. Simonyan & A, Zisserman Very Deep Convolutional Networks for
 # Large-scale Image Recognition, 3rd International Conference on
-# Learning Representations, 2015
-#
+# Learning Representations, 2015.
 
 from models.backbone import Backbone 
 from tensorflow.keras import layers, models
