@@ -1,5 +1,9 @@
 # residual.py
 #
+#
+# Simon Parsons
+# 26-01-20
+#
 # Starting from:
 # https://gist.github.com/FirefoxMetzger/6b6ccf4f7c344459507e73bbd13ec541rting from:
 # 
@@ -9,7 +13,6 @@
 # for image recognition. In Proceedings of the IEEE conference on
 # computer vision and pattern recognition (pp. 770–778).
 
-#import keras
 from keras.layers import Layer
 
 # Based on the Keras base layer:
@@ -21,19 +24,21 @@ class Residual(Layer):
         self.kernel = kernel
 
     # The business part of the layer, which implements the structure
-    # from Figure 2 of He et al. (2016):
+    # from Figure 2 of He et al. (2016). The notation for the
+    # intermediate outputs is taken from He et al. (2016) Section 3.2
     def call(self, input):
         # In Figure 2, x feeds directly into the convolutional layers,
         # but here we pass the input through an activation layer
         # first.
         x = Activation("linear", trainable=False)(input)
         # First convolution in the residual leyer
-        conv_x = Conv2D(self.channels_in,
+        w1_x = Conv2D(self.channels_in,
                         self.kernel,
                         padding="same")(x)
         # Then through a RELU
-        conv_x_relu =   Activation("relu")(conv_x)
-        # Second convolutional layer gives us F(x)
+        sigma_w1_x =   Activation("relu")(w1_x)
+        # Second convolutional layer gives us F(x) (also w2_sigma_w1_x
+        # in my version of the nottation from Section 3.2).
         Fx =            Conv2D( self.channels_in,
                                 self.kernel,
                                 padding="same")(conv_x_relu)
