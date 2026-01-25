@@ -12,6 +12,7 @@
 # for image recognition. In Proceedings of the IEEE conference on
 # computer vision and pattern recognition (pp. 770–778).
 
+from keras import layers
 from keras.layers import Layer
 
 # Based on the Keras base layer:
@@ -19,9 +20,14 @@ from keras.layers import Layer
 class Residual(Layer):
     def __init__(self, filters, kernel,**kwargs):
         super(Residual, self).__init__(**kwargs)
-        self.channels_in = channels_in
+        self.filters = filters
         self.kernel = kernel
-
+        self.x = None
+        self.w1_x = None
+        self.sigma_w1_x = None
+        self.Fx = None
+        self.Fx_plus_x = None
+        
     # The business part of the layer, which implements the structure
     # from Figure 2 of He et al. (2016). The notation for the
     # intermediate outputs is taken from He et al. (2016) Section 3.2
@@ -29,39 +35,23 @@ class Residual(Layer):
         # In Figure 2, x feeds directly into the convolutional layers,
         # but here we pass the input through an activation layer
         # first.
-        x = Activation("linear", trainable=False)(input)
-        # First convolution in the residual leyer
-        w1_x = Conv2D(self.filters,
+        self.x = layers.Activation("linear", trainable=False)(input)
+        # First convolution in the residual layer
+        self.w1_x = layers.Conv2D(self.filters,
                       self.kernel,
-                      padding="same")(x)
+                      padding="same")(self.x)
         # Then through a RELU
-        sigma_w1_x =   Activation("relu")(w1_x)
+        self.sigma_w1_x =  layers.Activation("relu")(self.w1_x)
         # Second convolutional layer gives us F(x) (also w2_sigma_w1_x
-        # in my version of the nottation from Section 3.2).
-        Fx =  Conv2D( self.filters,
+        # in my version of the notation from Section 3.2).
+        self.Fx =  layers.Conv2D( self.filters,
                       self.kernel,
-                      padding="same")(sigma_w1_x)
+                      padding="same")(self.sigma_w1_x)
         # Now add in our residual, which is the unprocessed x (called
         # the identity in Figure 2)
-        Fx_plus_x = Add()([Fx, x])
+        self.Fx_plus_x = layers.Add()([self.Fx, self.x])
         # One more RELU and we are done
-        output = Activation("relu")(Fx_plus_x)
-        
-        return output
-
-    #def call(self, x):
-    #    # the residual block using Keras functional API
-    #    first_layer =   Activation("linear", trainable=False)(x)
-    #    x =             Conv2D( self.channels_in,
-    #                            self.kernel,
-    #                            padding="same")(first_layer)
-    #    x =             Activation("relu")(x)
-    #    x =             Conv2D( self.channels_in,
-    #                            self.kernel,
-    #                            padding="same")(x)
-    #    residual =      Add()([x, first_layer])
-    #    x =             Activation("relu")(residual)
-    #    return x
+        return  layers.Activation("relu")(self.Fx_plus_x)
 
     def compute_output_shape(self, input_shape):
         return input_shape

@@ -17,8 +17,8 @@
 # Note that this structure is that of FirefoxMetzger, not one from He at al.
 
 from models.backbone import Backbone 
+from models.residual import Residual
 from tensorflow.keras import layers, models
-import residual.py
 
 class ResNet(Backbone):
 
@@ -32,7 +32,7 @@ class ResNet(Backbone):
     strides = 1             # don't downsample via stride
 
     # Define how we will build the model
-    model = models.Sequential(name='Simple ResNet')
+    model = models.Sequential(name='Simple_ResNet')
 
     # By my count this is a 13 layer model: one intro comvoltuional
     # layer, 5 residual blocks for anotehr 10 convolutional layers,
@@ -41,31 +41,29 @@ class ResNet(Backbone):
         # Pre-processing
         #
         # Create the input layer to understand the shape of each image and batch-size 
-        self.model.add(
-            layers.Input(
-                shape=self.img_shape,
-                name='Input_Layer',
-            )
-        )
+#        self.model.add(
+#            layers.Input(
+#                shape=self.img_shape,
+#                name='Input_Layer',
+#            )
+#        )
         
         # Add a rescaling layer to convert the inputs to fall in the range (-1, 1).
         # https://machinelearningmastery.com/image-augmentation-with-keras-preprocessing-layers-and-tf-image/
-        self.model.add(
-            layers.Rescaling(
-                1/127.5,
-                offset=-1
-            )
-        )
+        #self.model.add(
+        #    layers.Rescaling(
+        #        1/127.5,
+        #        offset=-1
+        #    )
+        #)
 
         # Now the network proper.
         #
-        # Initial comvolutional layers
-        self.model.add(Conv2D(32, (3, 3),
-                              padding='same'))
-        #self.model.add(Conv2D(32, (3, 3),
-        #                      padding='same',
-        #                      input_shape=x_train.shape[1:]))
-        self.model.add(Activation('relu'))
+        # Initial convolutional layers
+        self.model.add(layers.Conv2D(32, (3, 3),
+                                     padding='same',
+                                     input_shape=self.img_shape))
+        self.model.add(layers.Activation('relu'))
 
         # A stack of residual blocks
         self.model.add(Residual(32,(3,3)))
@@ -75,9 +73,11 @@ class ResNet(Backbone):
         self.model.add(Residual(32,(3,3)))
 
         # Output layers
-        self.model.add(Flatten())
-        self.model.add(Dense(512))
-        self.model.add(Activation(self.activation))
-        self.model.add(Dropout(self.dropout_rate))
-        self.model.add(Dense(self.num_classes))
-        self.model.add(Activation('softmax'))
+        self.model.add(layers.Flatten())
+        self.model.add(layers.Dense(512))
+        self.model.add(layers.Activation(self.activation))
+        self.model.add(layers.Dropout(self.dropout_rate))
+        self.model.add(layers.Dense(self.num_classes))
+        self.model.add(layers.Activation('softmax'))
+
+        self.model.build((None, 32, 32, 3))

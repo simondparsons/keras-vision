@@ -95,6 +95,8 @@ def main():
         network = VGG16(img_shape, num_classes)
     elif arch ==  'VGG19':
         network = VGG19(img_shape, num_classes)
+    elif arch ==  'ResNet':
+        network = ResNet(img_shape, num_classes)
     else:
         print("I don't know the model:", args.model)
         exit(0)
@@ -102,7 +104,7 @@ def main():
     network.buildModel()
     print(network.model.name)
     model = network.model
-
+    
     # Now compile the model
     model.compile(
         loss="categorical_crossentropy",
