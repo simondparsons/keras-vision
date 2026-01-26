@@ -14,7 +14,9 @@
 # for image recognition. In Proceedings of the IEEE conference on
 # computer vision and pattern recognition (pp. 770–778).
 #
-# Note that this structure is that of FirefoxMetzger, not one from He at al. (it is much shallower, but works as a demo.
+# Note that this structure is that of FirefoxMetzger, not one from He
+# at al. and does not run because of the issues reported in
+# Residual.py
 
 from models.backbone import Backbone 
 from models.residual import Residual

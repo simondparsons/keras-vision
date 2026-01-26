@@ -12,6 +12,11 @@
 # for image recognition. In Proceedings of the IEEE conference on
 # computer vision and pattern recognition (pp. 770–778).
 
+# This currently does not work because of the way that Keras handles
+# the class variables when we create multiple instances of the class
+# in parallel.
+#
+# 
 from keras import layers
 from keras.layers import Layer
 
