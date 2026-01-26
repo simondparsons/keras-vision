@@ -37,9 +37,14 @@ class Residual(Layer):
         # first.
         self.x = layers.Activation("linear", trainable=False)(input)
         # First convolution in the residual layer
-        self.w1_x = layers.Conv2D(self.filters,
-                      self.kernel,
-                      padding="same")(self.x)
+        if self.w1_x == None:
+            self.w1_x = layers.Conv2D(self.filters,
+                                      self.kernel,
+                                      padding="same")(self.x)
+        else:
+            self.w1_x = layers.Conv2D(self.filters,
+                                      self.kernel,
+                                      padding="same")(self.x)
         # Then through a RELU
         self.sigma_w1_x =  layers.Activation("relu")(self.w1_x)
         # Second convolutional layer gives us F(x) (also w2_sigma_w1_x

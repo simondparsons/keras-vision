@@ -14,7 +14,7 @@
 # for image recognition. In Proceedings of the IEEE conference on
 # computer vision and pattern recognition (pp. 770–778).
 #
-# Note that this structure is that of FirefoxMetzger, not one from He at al.
+# Note that this structure is that of FirefoxMetzger, not one from He at al. (it is much shallower, but works as a demo.
 
 from models.backbone import Backbone 
 from models.residual import Residual
@@ -67,10 +67,10 @@ class ResNet(Backbone):
 
         # A stack of residual blocks
         self.model.add(Residual(32,(3,3)))
-        self.model.add(Residual(32,(3,3)))
-        self.model.add(Residual(32,(3,3)))
-        self.model.add(Residual(32,(3,3)))
-        self.model.add(Residual(32,(3,3)))
+        #self.model.add(Residual(32,(3,3)))
+        #self.model.add(Residual(32,(3,3)))
+        #self.model.add(Residual(32,(3,3)))
+        #self.model.add(Residual(32,(3,3)))
 
         # Output layers
         self.model.add(layers.Flatten())
