@@ -27,7 +27,7 @@ from operator import itemgetter
 from models.vgg11 import VGG11
 from models.vgg16 import VGG16
 from models.vgg19 import VGG19
-from models.resnet import ResNet
+from models.simpleResnet import ResNet
 
 def main():
     # Generalise the code by allowing the model, dataset and some of the
@@ -146,10 +146,11 @@ def main():
             epochs=50,
             validation_split = validation_split,
             callbacks=[early_stopping]
-        )    
+        )
 
     # Print a summary of the model
     model.summary()
+
 
     # Show the change in accuracy and loss over training.
     if args.display == 'y' or args.display == 'yes':
