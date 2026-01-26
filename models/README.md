@@ -11,7 +11,7 @@ As recorded elsewhere, all these models were pulled together (I hesitate to say 
 ## VGGs
 
 All models drawn from:
-K. Simonyan & A, Zisserman Very Deep Convolutional Networks for Large-scale Image Recognition, 3rd International Conference on Learning Representations, 2015.
+K. Simonyan & A, Zisserman (2015) Very Deep Convolutional Networks for Large-scale Image Recognition, 3rd International Conference on Learning Representations.
 
 ### VGG11
 
@@ -32,8 +32,10 @@ The deepest model from the paper. We have 2 x 64 filter layers, 2 x 128 filter l
 As introduced by:
 He, K., Zhang, X., Ren, S., & Sun, J. (2016). Deep residual learning for image recognition. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (pp. 770–778).
 
+Note that this paper shows (again) the ambiguuity over what counts as "deep" in deep learning. The VGG paper refers to a 19 weight-layer network as "very deep", while a year later this paper includes a 152-layer network and doesn't apparently consider that "very" deep (perhaps because, as they report, it has lower complexity than VGG19)
+
 ### ResNet
 
-A simple ResNet to illustrate how residuals can be handled. Has only 6 convolutional layers: 16, 2 x 32, 2 x 64 and 128 filters, followed by a 10 unit FC layer.
+A simple ResNet to illustrate how residuals can be handled. Has only 6 convolutional layers: 16 filters, 2 x 32 filters, 2 x 64 filters and 128 filters, followed by a 10 unit FC layer. Despite being in the "needs CUDA" collection, this actually runs ok on a laptop CPU.
 
 ### Resnet18
