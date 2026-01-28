@@ -1,7 +1,7 @@
 # simple-resnet.py
 #
 # Simon Parsons
-# 26-02-26
+# 26-01-26
 #
 # Merging the approach I used for simple CNN models, which was based on:
 # https://exowanderer.medium.com/what-is-this-keras-thing-anyways-fe7aa00158ef
@@ -18,7 +18,7 @@
 # Note that this structure is that of that of aliprf, not one from He
 # at al. (it is much shallower), but works as a demo. Some of the
 # detail differs from aliprf since I think he got some of it
-# wrong. Als, unlike Aliprf's cde, this copes with residuals x that
+# wrong. Also, unlike Aliprf's code, this copes with residuals x that
 # have a different shape to F(x).
 #
 # TODO: Build a version with residual blocks defined using a Residual
