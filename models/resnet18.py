@@ -90,6 +90,8 @@ class ResNet18(Backbone):
         
         input = layers.Input(shape=(self.img_shape))
 
+        # conv1 (see He el al. (2016), Table 1)
+        #
         # Initial Conv2D and maxPooling
         #
         # As in He et al. this is a 7x7 filter with stride 2.
@@ -100,7 +102,9 @@ class ResNet18(Backbone):
                               name='cnv2d')(input)
         maxpool = layers.MaxPooling2D(pool_size=self.pool_shape,
                                       name="maxpool")(cnv2d)
-        
+
+        # conv2_x
+        #
         # Block 1
         #
         # Defines a single residual block as in He et al's Figure
@@ -146,6 +150,8 @@ class ResNet18(Backbone):
         b2_add = layers.add([b1_relu_2, b2_bn_2], name='b2_residual')
         b2_relu_2 = layers.ReLU(name='b2_relu_2')(b2_add)
 
+        # conv3_x
+        #
         # Block 3
         #
         # Number of filters increases
@@ -168,8 +174,7 @@ class ResNet18(Backbone):
         identity3 = PadLayer()(b2_relu_2, channels1=self.nfilters_1, channels2=self.nfilters_2)
         b3_add = layers.add([identity3, b3_bn_2], name='b3_residual')
         b3_relu_2 = layers.ReLU(name='b3_relu_2')(b3_add)
-
-        
+        #
         # Block 4
         b4_cnv2d_1 = layers.Conv2D(filters=self.nfilters_2,
                                    kernel_size=self.kernel_shape,
@@ -188,6 +193,8 @@ class ResNet18(Backbone):
         b4_add = layers.add([b3_relu_2, b4_bn_2], name='b4_residual')
         b4_relu_2 = layers.ReLU(name='b4_relu_2')(b4_add)
 
+        # conv4_x
+        #
         # Block 5
         #
         # Number of filters increases, and we downsample in the convolution.
@@ -205,7 +212,7 @@ class ResNet18(Backbone):
                                    name='b5_cnv2d_2')(b5_relu_1)
         b5_bn_2 = layers.BatchNormalization(name='b5_bn_2')(b5_cnv2d_2)
         # Residual layer, cases 2 and 3. First we do the usual padding
-        padded = PadLayer(name='b5_pd_1')(b4_relu_2, channels1=self.nfilters_2, channels2=self.nfilters_3)
+        padded5 = PadLayer(name='b5_pd_1')(b4_relu_2, channels1=self.nfilters_2, channels2=self.nfilters_3)
         # This leaves us with the right number of channels but too
         # large an image. Solve this by convolution with an identity
         # kernel with stride > 1. This is wrapped in a DownSample
@@ -213,10 +220,10 @@ class ResNet18(Backbone):
         identity5 = DSLayer(filters=self.nfilters_3,
                             kernel_size=(1, 1),
                             strides=self.strides_ds,
-                            name='b5_ds_1')(padded)
+                            name='b5_ds_1')(padded5)
         b5_add = layers.add([identity5, b5_bn_2], name='b5_residual')
         b5_relu_2 = layers.ReLU(name='b5_relu_2')(b5_add)
-
+        #
         # Block 6
         b6_cnv2d_1 = layers.Conv2D(filters=self.nfilters_3,
                                    kernel_size=self.kernel_shape,
@@ -234,10 +241,55 @@ class ResNet18(Backbone):
         # Residual layer, case 1).
         b6_add = layers.add([b5_relu_2, b6_bn_2], name='b6_residual')
         b6_relu_2 = layers.ReLU(name='b6_relu_2')(b6_add)
-        
+
+        # conv5_x
+        #
+        # Block 7
+        #
+        # Number of filters increases, and we downsample in the convolution.
+        b7_cnv2d_1 = layers.Conv2D(filters=self.nfilters_4,
+                                   kernel_size=self.kernel_shape,
+                                   strides=self.strides_ds,
+                                   padding=self.padding,
+                                   name='b7_cnv2d_1')(b6_relu_2)
+        b7_bn_1 = layers.BatchNormalization(name='b7_bn_1')(b7_cnv2d_1)
+        b7_relu_1 = layers.ReLU(name='b7_relu_1')(b7_bn_1)
+        b7_cnv2d_2 = layers.Conv2D(filters=self.nfilters_4,
+                                   kernel_size=self.kernel_shape,
+                                   strides=self.strides,
+                                   padding=self.padding,
+                                   name='b7_cnv2d_2')(b7_relu_1)
+        b7_bn_2 = layers.BatchNormalization(name='b7_bn_2')(b7_cnv2d_2)
+        # Residual layer, cases 2 and 3. Padding and then downsampling
+        padded7 = PadLayer(name='b7_pd_1')(b6_relu_2, channels1=self.nfilters_3, channels2=self.nfilters_4)
+        identity7 = DSLayer(filters=self.nfilters_4,
+                            kernel_size=(1, 1),
+                            strides=self.strides_ds,
+                            name='b7_ds_1')(padded7)
+        b7_add = layers.add([identity7, b7_bn_2], name='b7_residual')
+        b7_relu_2 = layers.ReLU(name='b7_relu_2')(b7_add)
+        #
+        # Block 8
+        b8_cnv2d_1 = layers.Conv2D(filters=self.nfilters_4,
+                                   kernel_size=self.kernel_shape,
+                                   strides=self.strides,
+                                   padding=self.padding,
+                                   name='b8_cnv2d_1')(b7_relu_2)
+        b8_bn_1 = layers.BatchNormalization(name='b8_bn_1')(b8_cnv2d_1)
+        b8_relu_1 = layers.ReLU(name='b8_relu_1')(b8_bn_1)
+        b8_cnv2d_2 = layers.Conv2D(filters=self.nfilters_4,
+                                   kernel_size=self.kernel_shape,
+                                   strides=self.strides,
+                                   padding=self.padding,
+                                   name='b8_cnv2d_2')(b8_relu_1)
+        b8_bn_2 = layers.BatchNormalization(name='b8_bn_2')(b8_cnv2d_2)
+        # Residual layer, case 1).
+        b8_add = layers.add([b7_relu_2, b8_bn_2], name='b8_residual')
+        b8_relu_2 = layers.ReLU(name='b8_relu_2')(b8_add)
+               
         # Output stage: Average pooling then flatten and put through a
         # Dense layer with the same number of output units as classes.
-        avg_pool = layers.GlobalAveragePooling2D()(b6_relu_2)
+        avg_pool = layers.GlobalAveragePooling2D()(b8_relu_2)
         flatten = layers.Flatten(name="flatten_to_dense")(avg_pool)        
         # He at al. do not use Dropout, but I do for continuity with
         # the other models.

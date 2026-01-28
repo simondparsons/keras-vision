@@ -26,7 +26,7 @@ import tensorflow as tf
 class DSLayer(layers.Conv2D):
 
     # Everything is done in initialization. Ideally we wouldn't have
-    # top pass kernel_size, but this seems to be obligatory. So we
+    # to pass kernel_size, but this seems to be obligatory. So we
     # ignore whatever value is passed.
     def __init__(self, filters, kernel_size, strides, name):
         super(DSLayer, self).__init__(
