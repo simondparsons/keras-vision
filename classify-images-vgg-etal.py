@@ -28,6 +28,7 @@ from models.vgg16 import VGG16
 from models.vgg19 import VGG19
 from models.simpleResnet import ResNet
 #from models.resnet import ResNet
+from models.resnet18 import ResNet18
 
 def main():
     # Generalise the code by allowing the model, dataset and some of the
@@ -97,6 +98,8 @@ def main():
         network = VGG19(img_shape, num_classes)
     elif arch ==  'ResNet':
         network = ResNet(img_shape, num_classes)
+    elif arch ==  'ResNet18':
+        network = ResNet18(img_shape, num_classes)        
     else:
         print("I don't know the model:", args.model)
         exit(0)
@@ -104,7 +107,9 @@ def main():
     network.buildModel()
     print(network.model.name)
     model = network.model
-    
+    # Print a summary of the model
+    model.summary()
+
     # Now compile the model
     model.compile(
         loss="categorical_crossentropy",
@@ -147,10 +152,6 @@ def main():
             validation_split = validation_split,
             callbacks=[early_stopping]
         )
-
-    # Print a summary of the model
-    model.summary()
-
 
     # Show the change in accuracy and loss over training.
     if args.display == 'y' or args.display == 'yes':
