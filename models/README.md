@@ -21,7 +21,7 @@ The original model had two 4096 fully-connected layers followed by a 100 unit FC
 
 ### VGG16
 
-The paper contains 11, 13, 16 and 19 layer models. This is the 16-layer model with only 3 x 3 convolutions (there is a version with some 1 x 1 covolution layers). There are the same number of blocks as in the 11 model, but with more filters in each (and less than in the 19 layer model). In partiocular, we have: 2 x 64 filter layers, 2 x 128 filter layers, 3 x 256 filter layers, 3 x 512 filter layers and another 3 x 512 filter layers, followed by a 120 unit FC layer, an 84 unit FC layer and then the 10 unit output layer.
+The paper contains 11, 13, 16 and 19 layer models. This is the 16-layer model with only 3 x 3 convolutions (there is a version with some 1 x 1 covolution layers). There are the same number of blocks as in the 11 model, but with more filters in each (and less than in the 19 layer model). In particular, we have: 2 x 64 filter layers, 2 x 128 filter layers, 3 x 256 filter layers, 3 x 512 filter layers and another 3 x 512 filter layers, followed by a 120 unit FC layer, an 84 unit FC layer and then the 10 unit output layer.
 
 ### VGG19
 
@@ -32,10 +32,12 @@ The deepest model from the paper. We have 2 x 64 filter layers, 2 x 128 filter l
 As introduced by:
 He, K., Zhang, X., Ren, S., & Sun, J. (2016). Deep residual learning for image recognition. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (pp. 770–778).
 
-Note that this paper shows (again) the ambiguuity over what counts as "deep" in deep learning. The VGG paper refers to a 19 weight-layer network as "very deep", while a year later this paper includes a 152-layer network and doesn't apparently consider that "very" deep (perhaps because, as they report, it has lower complexity than VGG19)
+Note that this paper shows (again) the ambiguity over what counts as "deep" in deep learning. The VGG paper refers to a 19 weight-layer network as "very deep", while a year later this paper includes a 152-layer network and doesn't apparently consider that "very" deep (perhaps because, as they report, it has lower complexity than VGG19)
 
 ### ResNet
 
 A simple ResNet to illustrate how residuals can be handled. Has only 6 convolutional layers: 16 filters, 2 x 32 filters, 2 x 64 filters and 128 filters, followed by a 10 unit FC layer. Despite being in the "needs CUDA" collection, this actually runs ok on a laptop CPU.
 
 ### Resnet18
+
+The simplest model from He et al (see Table 1) with 18 weight layers: a 64 filter layer (with 7x7 filters) then 4 x 64 filters, 4 x 128 filters, 4 x 128 filters, 4 x 512 filters, followed by a 10 unit FC layer. As described in the code, this downsamples less than the original ResNet18 so that it works on smaller images.

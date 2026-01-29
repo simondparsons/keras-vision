@@ -32,7 +32,7 @@ from models.padLayer import PadLayer
 from tensorflow.keras import layers, models
 import tensorflow as tf
 
-class ResNet(Backbone):
+class SimpleResNet(Backbone):
     # Set up some constants that we will use to do this across the
     # various layers. These are broadly the same as for other models
     # in this series.

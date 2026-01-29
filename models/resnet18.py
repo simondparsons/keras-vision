@@ -15,18 +15,15 @@
 # for image recognition. In Proceedings of the IEEE Conference on
 # Computer Vision and Pattern Recognition (pp. 770–778).
 #
+# This was written with teahcing in mind, so always aims for clarity
+# over efficiency. I'm sure that there are many ways it can be optimized.
+#
 # Note that this general approach started from aliprf but uses the
-# ResNet18 architecture from He at al, 2016, Table 1). Some of the
+# ResNet18 architecture from He at al, (2016, Table 1). Some of the
 # detail differs from aliprf since I think they got some of it wrong
 # (particularly around the handling of residuals). As a result, unlike
-# Aliprf's code, this copes with residuals x that have a different
-# shape to F(x).
-#
-# TODO: Build a version with residual blocks defined using a Residual
-# class as in:
-# https://gist.github.com/FirefoxMetzger/6b6ccf4f7c344459507e73bbd13ec541rting from:
-#
-# A starter version is in residual.py, but it doesn't yet work.
+# Aliprf's code, this includes residuals x that have a different shape
+# to F(x).
 #
 # Using functions for each layer would undoubtedly be neater (and
 # nicely hierarchical) but would hide some of the complexity which I
@@ -37,13 +34,25 @@
 # convolutional layer with a stride > 1, so F(x) is a smaller "image"
 # than x.
 #
+# Having said that, I would not fancy creating a deep ResNet than this
+# without building in some form of abstraction.
+#
 # Note that in the networks in He at al., cases 2 and 3 are always
-# combined (each group of blocks starts with a convolutional layer
-# that downsamples and increases the number of filters), but since I
-# was working with smaller images, this version of ResNet18 doesn't
-# downsample at every block. It would normally make sense to do the
-# down-sampling earlier in the network, but since this code was
-# developed for teaching, I wanted to introduce the cases one by one.
+# combined. In Figure 3 each group of same-coloured blocks starts with
+# a convolutional layer that downsamples by setting strides=2, and
+# also increases the number of filters. (The downsampling is implicit
+# in Table 1 where ResNet18 is specified.). Since I was working with
+# smaller images, this version of ResNet18 doesn't downsample at every
+# block. It would normally make sense to do the down-sampling earlier
+# in the network, but since this code was developed for teaching, I
+# wanted to introduce the cases one by one.
+
+# TODO: Build a version with residual blocks defined using a Residual
+# class as in:
+# https://gist.github.com/FirefoxMetzger/6b6ccf4f7c344459507e73bbd13ec541rting from:
+#
+# A starter version is in residual.py, but it doesn't yet work.
+#
 
 from models.backbone import Backbone
 from models.padLayer import PadLayer
