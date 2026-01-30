@@ -98,7 +98,8 @@ class ResNet18(Backbone):
     def buildModel(self):
         
         input = layers.Input(shape=(self.img_shape))
-
+        rescale = layers.Rescaling(1/127.5,offset=-1)(input)
+        
         # conv1 (see He el al. (2016), Table 1)
         #
         # Initial Conv2D and maxPooling
@@ -108,7 +109,7 @@ class ResNet18(Backbone):
                               kernel_size=(7, 7),
                               strides=self.strides_ds,
                               padding=self.padding,
-                              name='cnv2d')(input)
+                              name='cnv2d')(rescale)
         maxpool = layers.MaxPooling2D(pool_size=self.pool_shape,
                                       name="maxpool")(cnv2d)
 
