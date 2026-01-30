@@ -34,45 +34,37 @@ class ResNet(Backbone):
     strides = 1             # don't downsample via stride
 
     # Define how we will build the model
-    model = models.Sequential(name='Simple_ResNet')
+    model = models.Sequential(name='Simple_ResNet_Classes')
 
-    # By my count this is a 13 layer model: one intro comvoltuional
-    # layer, 5 residual blocks for anotehr 10 convolutional layers,
+    # By my count this is a 13 layer model: one intro convolutional
+    # layer, 5 residual blocks for another 10 convolutional layers,
     # and then two FC layers at the end.
     def buildModel(self):
         # Pre-processing
         #
         # Create the input layer to understand the shape of each image and batch-size 
-#        self.model.add(
-#            layers.Input(
-#                shape=self.img_shape,
-#                name='Input_Layer',
-#            )
-#        )
+        self.model.add(layers.Input(shape=self.img_shape,
+                                    name='Input_Layer'))
         
         # Add a rescaling layer to convert the inputs to fall in the range (-1, 1).
         # https://machinelearningmastery.com/image-augmentation-with-keras-preprocessing-layers-and-tf-image/
-        #self.model.add(
-        #    layers.Rescaling(
-        #        1/127.5,
-        #        offset=-1
-        #    )
-        #)
-
+        self.model.add(layers.Rescaling(1/127.5,
+                                        offset=-1))
+        
         # Now the network proper.
         #
-        # Initial convolutional layers
+        # Initial convolutional layer. Keeping convolution and
+        # activation separate in ResNet style.
         self.model.add(layers.Conv2D(32, (3, 3),
-                                     padding='same',
-                                     input_shape=self.img_shape))
+                                     padding='same'))
         self.model.add(layers.Activation('relu'))
 
         # A stack of residual blocks
         self.model.add(Residual(32,(3,3)))
-        #self.model.add(Residual(32,(3,3)))
-        #self.model.add(Residual(32,(3,3)))
-        #self.model.add(Residual(32,(3,3)))
-        #self.model.add(Residual(32,(3,3)))
+        self.model.add(Residual(32,(3,3)))
+        self.model.add(Residual(32,(3,3)))
+        self.model.add(Residual(32,(3,3)))
+        self.model.add(Residual(32,(3,3)))
 
         # Output layers
         self.model.add(layers.Flatten())
@@ -82,4 +74,4 @@ class ResNet(Backbone):
         self.model.add(layers.Dense(self.num_classes))
         self.model.add(layers.Activation('softmax'))
 
-        self.model.build((None, 32, 32, 3))
+        self.model.build()#(None, 32, 32, 3))

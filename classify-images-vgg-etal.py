@@ -48,7 +48,7 @@ def main():
     # Batch size, in case we need to adjust this
     parser.add_argument('--batch_size', help='Specify batch size', default=64)
     # Patience, in case we need to adjust this
-    parser.add_argument('--patience', help='How many epochs to wait before inviking early stopping ', default=3)
+    parser.add_argument('--patience', help='How many epochs to wait before invoking early stopping ', default=3)
 
     args = parser.parse_args()
 
