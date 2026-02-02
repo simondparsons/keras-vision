@@ -46,7 +46,7 @@ The simplest model from He et al (see Table 1) with 18 weight layers: a 64 filte
 
 ### SimpleClassResNet
 
-My model of ResNet18 is as complex a network as I want to implement without some kind of hierarchical structure. (Arguably it is already too complex, though I think it is instructive to have ot dela with the complexity, especially in terms of the different cases of residual combination.)  A cleaner structure provides a Residual class that implements a residual block as a Keras Layer, and this code gives a simple version that fits the structure of ResNets from He at al. while remaining relatively small. It would be a ResNet10 if we chose to classify it that way, with 2 x 64 filters (1 residual layer), 2 x 128 filters, 2 x 256 filters, 2 x 512 filters. Several blocks downsample jus to show we can do that.
+My model of ResNet18 is as complex a network as I want to implement without some kind of hierarchical structure. (Arguably it is already too complex, though I think it is instructive to have to deal with the complexity, especially in terms of the different cases of residual combination.)  A cleaner structure provides a Residual class that implements a residual block as a Keras Layer, and this code gives a simple version that fits the structure of ResNets from He at al. while remaining relatively small. It would be a ResNet10 if we chose to classify it that way, with 2 x 64 filters (1 residual layer), 2 x 128 filters, 2 x 256 filters, 2 x 512 filters plus the initial 64 filter layer and the FC output layer. Several blocks downsample just to show we can do that.
 
 ### ResNet34
 
