@@ -34,10 +34,21 @@ He, K., Zhang, X., Ren, S., & Sun, J. (2016). Deep residual learning for image r
 
 Note that this paper shows (again) the ambiguity over what counts as "deep" in deep learning. The VGG paper refers to a 19 weight-layer network as "very deep", while a year later this paper includes a 152-layer network and doesn't apparently consider that "very" deep (perhaps because, as they report, it has lower complexity than VGG19)
 
-### ResNet
+### SimpleResNet
 
-A simple ResNet to illustrate how residuals can be handled. Has only 6 convolutional layers: 16 filters, 2 x 32 filters, 2 x 64 filters and 128 filters, followed by a 10 unit FC layer. Despite being in the "needs CUDA" collection, this actually runs ok on a laptop CPU.
+As the name suggests, a simple ResNet to illustrate how residuals can be handled. A good place ot start understanding the code. Has only 6 convolutional layers: 16 filters, 2 x 32 filters, 2 x 64 filters and 128 filters, followed by a 10 unit FC layer. Despite being in the "needs CUDA" collection, this actually runs ok on a laptop CPU.
 
-### Resnet18
+Note that it will only handle grey scale images. The issue is easy to fix (as in ResNet18), but couldn't be bothered to backpropagate it.
 
-The simplest model from He et al (see Table 1) with 18 weight layers: a 64 filter layer (with 7x7 filters) then 4 x 64 filters, 4 x 128 filters, 4 x 128 filters, 4 x 512 filters, followed by a 10 unit FC layer. As described in the code, this downsamples less than the original ResNet18 so that it works on smaller images.
+### ResNet18
+
+The simplest model from He et al (see Table 1) with 18 weight layers: a 64 filter layer (with 7x7 filters) then 4 x 64 filters, 4 x 128 filters, 4 x 256 filters, 4 x 512 filters, followed by a 10 unit FC layer. As described in the code, this downsamples less than the original ResNet18 so that it works on smaller images.
+
+### SimpleClassResNet
+
+My model of ResNet18 is as complex a network as I want to implement without some kind of hierarchical structure. (Arguably it is already too complex, though I think it is instructive to have ot dela with the complexity, especially in terms of the different cases of residual combination.)  A cleaner structure provides a Residual class that implements a residual block as a Keras Layer, and this code gives a simple version that fits the structure of ResNets from He at al. while remaining relatively small. It would be a ResNet10 if we chose to classify it that way, with 2 x 64 filters (1 residual layer), 2 x 128 filters, 2 x 256 filters, 2 x 512 filters. Several blocks downsample jus to show we can do that.
+
+### ResNet34
+
+The prototypical model from He et al (see Table 1 and Figure 2) with 34 weight layers: a 64 filter layer (with 7x7 filters) then 6 x 64 filters (3 residual layers), 8 x 128 filters, 12 x 256 filters, 6 x 512 filters, followed by a 10 unit FC layer. As described in the code, this downsamples less than the original ResNet34 so that it works on smaller images.
+

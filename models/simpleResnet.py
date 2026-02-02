@@ -21,11 +21,12 @@
 # wrong. Also, unlike Aliprf's code, this copes with residuals x that
 # have a different shape to F(x).
 #
-# TODO: Build a version with residual blocks defined using a Residual
-# class as in:
-# https://gist.github.com/FirefoxMetzger/6b6ccf4f7c344459507e73bbd13ec541rting from:
-#
-# A starter version is in residual.py, but it doesn't yet work.
+# This version also only works with gray-scale images. It relies on
+# the fact that the Add layer can combine a 1 channel tensor with a 32
+# channel tensor(apparently) in a way that it can't combine a 3
+# channel tensor with a 32 channel one. Applying a suitable
+# convolution layer (as ResNet18 et al. do) will make this problem go
+# away.
 
 from models.backbone import Backbone
 from models.padLayer import PadLayer

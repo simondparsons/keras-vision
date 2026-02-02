@@ -1,36 +1,37 @@
-# resnet.py
+# simpleClassResnet.py
 #
 # Simon Parsons
-# 26-01-20
+# 26-02-02
 #
 # A merge of ideas from
 # https://exowanderer.medium.com/what-is-this-keras-thing-anyways-fe7aa00158ef
 # and
 # https://gist.github.com/FirefoxMetzger/6b6ccf4f7c344459507e73bbd13ec541rting from:
 #
-# to create a simple ResNet, as defined in
+# to create a simple ResNet that includes a residual layer class to
+# allowthe easy deifnition of deeper models. The ResNet structure comes
+# from
 #
 # He, K., Zhang, X., Ren, S., & Sun, J. (2016). Deep residual learning
 # for image recognition. In Proceedings of the IEEE conference on
 # computer vision and pattern recognition (pp. 770–778).
 #
-# Note that this structure is that of FirefoxMetzger, not one from He
-# at al. and does not run because of the issues reported in
-# Residual.py
+# Note that this code started with that of FirefoxMetzger, but goes
+# further to handle blocks with different numbers of filters and
+# downsampling, getting to something that implements the kinds of
+# smaller networks from not one from He at al.
 
 from models.backbone import Backbone 
 from models.residual import Residual
 from tensorflow.keras import layers, models
 
-class ResNet(Backbone):
+class SimpleClassResNet(Backbone):
 
     # Set up some constants that we will use to do this across the various
-    # layers.
-    kernel = (3, 3)        # Use 3 x 3 kernels throughout.
-    activation = 'relu'    # use Rectified Linear Unit activiation functions
+    # layers. The first constants apply to the residual layers
+    kernel = (3, 3)        # Use 3 x 3 kernels throughout the residual
+                           # layers.
     pool_shape = (2, 2)    # Reduce dimensionality by 4 = 2 x 2 in pooling layers
-    dropout_rate = 0.5     # Drop 50% of neurons
-    padding = 'same'       # Maintain the shape of feature maps per layer
     strides = (1, 1)       # Two stride values for downsampling (_ds)
     strides_ds = (2, 2)    # and not since orignal ResNet downsampled
                            # at the start of block from the second
@@ -40,10 +41,17 @@ class ResNet(Backbone):
     nfilters_3 = 256  
     nfilters_4 = 512
 
-    # Define how we will build the model
-    model = models.Sequential(name='Simple_ResNet_Classes')
+    # These apply to the layers defined here, basically the blocks
+    # before and after the residual layers
+    activation = 'relu'    # use Rectified Linear Unit activiation functions
+    dropout_rate = 0.5     # Drop 50% of neurons
+    padding = 'same'       # Maintain the shape of feature maps per layer
 
-    # Building up to Resnet34, as per He et al, (2016, Figure 3)
+    # Define how we will build the model
+    model = models.Sequential(name='SimpleClassResNet')
+
+    # Input and putput parts are as described in He at a. (2016), but
+    # we have many fewer layers. Good for debugging :-)
     def buildModel(self):
         # Pre-processing
         #
@@ -68,31 +76,17 @@ class ResNet(Backbone):
         self.model.add(layers.MaxPooling2D(pool_size=self.pool_shape,
                                       name="maxpool"))
 
-        # Three residual blocks with 64 filters each
-        self.model.add(Residual(self.nfilters_1, self.nfilters_1, self.strides, self.strides, self.kernel))
-        self.model.add(Residual(self.nfilters_1, self.nfilters_1, self.strides, self.strides, self.kernel))
-        self.model.add(Residual(self.nfilters_1, self.nfilters_1, self.strides, self.strides, self.kernel))
+        # A residual block with 64 filters each
+        self.model.add(Residual(self.nfilters_1, self.nfilters_2, self.strides, self.strides, self.kernel))
 
-        # Four blocks with 128 filters. We downsample at the first block.
+        # A residual block with 128 filters. We downsample at the first block.
         self.model.add(Residual(self.nfilters_2, self.nfilters_2, self.strides_ds, self.strides, self.kernel))
-        self.model.add(Residual(self.nfilters_2, self.nfilters_2, self.strides, self.strides, self.kernel))
-        self.model.add(Residual(self.nfilters_2, self.nfilters_2, self.strides, self.strides, self.kernel))
-        self.model.add(Residual(self.nfilters_2, self.nfilters_2, self.strides, self.strides, self.kernel))
 
-        # Six blocks with 256 filters. We downsample at the first block
-
+        # A residual block with 256 filters. We downsample at the first block
         self.model.add(Residual(self.nfilters_3, self.nfilters_3, self.strides_ds, self.strides, self.kernel))
-        self.model.add(Residual(self.nfilters_3, self.nfilters_3, self.strides, self.strides, self.kernel))
-        self.model.add(Residual(self.nfilters_3, self.nfilters_3, self.strides, self.strides, self.kernel))
-        self.model.add(Residual(self.nfilters_3, self.nfilters_3, self.strides, self.strides, self.kernel))
-        self.model.add(Residual(self.nfilters_3, self.nfilters_3, self.strides, self.strides, self.kernel))
-        self.model.add(Residual(self.nfilters_3, self.nfilters_3, self.strides, self.strides, self.kernel))
-        
-        # Three blocks with 512 filters.
-
-        self.model.add(Residual(self.nfilters_3, self.nfilters_3, self.strides, self.strides, self.kernel))
-        self.model.add(Residual(self.nfilters_3, self.nfilters_3, self.strides, self.strides, self.kernel))
-        self.model.add(Residual(self.nfilters_3, self.nfilters_3, self.strides, self.strides, self.kernel))
+       
+        # A residual block with 512 filters. 
+        self.model.add(Residual(self.nfilters_4, self.nfilters_4, self.strides, self.strides, self.kernel))
 
         # Output layers
         #

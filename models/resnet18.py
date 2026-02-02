@@ -71,7 +71,8 @@ class ResNet18(Backbone):
     padding = 'same'        # Maintain the shape of feature maps per layer
     strides = (1, 1)        # Two stride values for downsampling (_ds)
     strides_ds = (2, 2)     # and not since orignal ResNet downsampled
-                            # at the start of block from the second block.
+                            # at the start of block from the second
+                            # block onwards.
     nfilters_1 = 64         # Increase filters as we go further through the 
     nfilters_2 = 128        # backbone.
     nfilters_3 = 256  
@@ -96,7 +97,8 @@ class ResNet18(Backbone):
     # classification. In Proceedings of the IEEE International
     # Conference on Computer Vision (pp. 1026-1034).
     def buildModel(self):
-        
+
+        # Standard keras stuff. Create an input layer and rescale.
         input = layers.Input(shape=(self.img_shape))
         rescale = layers.Rescaling(1/127.5,offset=-1)(input)
         
@@ -229,8 +231,7 @@ class ResNet18(Backbone):
         # layer:
         identity5 = DSLayer(filters=self.nfilters_3,
                             kernel_size=(1, 1),
-                            strides=self.strides_ds,
-                            name='b5_ds_1')(padded5)
+                            strides=self.strides_ds)(padded5)
         b5_add = layers.add([identity5, b5_bn_2], name='b5_residual')
         b5_relu_2 = layers.ReLU(name='b5_relu_2')(b5_add)
         #
@@ -274,8 +275,7 @@ class ResNet18(Backbone):
         padded7 = PadLayer(name='b7_pd_1')(b6_relu_2, channels1=self.nfilters_3, channels2=self.nfilters_4)
         identity7 = DSLayer(filters=self.nfilters_4,
                             kernel_size=(1, 1),
-                            strides=self.strides_ds,
-                            name='b7_ds_1')(padded7)
+                            strides=self.strides_ds)(padded7)
         b7_add = layers.add([identity7, b7_bn_2], name='b7_residual')
         b7_relu_2 = layers.ReLU(name='b7_relu_2')(b7_add)
         #
@@ -299,7 +299,7 @@ class ResNet18(Backbone):
                
         # Output stage: Average pooling then flatten and put through a
         # Dense layer with the same number of output units as classes.
-        avg_pool = layers.GlobalAveragePooling2D()(b8_relu_2)
+        avg_pool = layers.GlobalAveragePooling2D(name="avpool")(b8_relu_2)
         flatten = layers.Flatten(name="flatten_to_dense")(avg_pool)        
         # He at al. do not use Dropout, but I do for continuity with
         # the other models.

@@ -27,8 +27,9 @@ from models.vgg11 import VGG11
 from models.vgg16 import VGG16
 from models.vgg19 import VGG19
 from models.simpleResnet import SimpleResNet
-from models.resnet import ResNet
 from models.resnet18 import ResNet18
+from models.simpleClassResnet import SimpleClassResNet
+from models.resnet34 import ResNet34
 
 def main():
     # Generalise the code by allowing the model, dataset and some of the
@@ -100,8 +101,12 @@ def main():
         network = ResNet(img_shape, num_classes)
     elif arch ==  'SimpleResNet':
         network = SimpleResNet(img_shape, num_classes)
+    elif arch ==  'SimpleClassResNet':
+        network = SimpleClassResNet(img_shape, num_classes)
     elif arch ==  'ResNet18':
         network = ResNet18(img_shape, num_classes)        
+    elif arch ==  'ResNet34':
+        network = ResNet34(img_shape, num_classes)        
     else:
         print("I don't know the model:", args.model)
         exit(0)

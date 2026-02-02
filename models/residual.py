@@ -1,12 +1,12 @@
 # residual.py
 #
 # Simon Parsons
-# 26-01-20
+# 26-02-02
 #
 # Starting from:
 # https://gist.github.com/FirefoxMetzger/6b6ccf4f7c344459507e73bbd13ec541rting from:
 # 
-# Provides a simple implementation of a residual block from:
+# Provides an implementation of a residual block from:
 #
 # He, K., Zhang, X., Ren, S., & Sun, J. (2016). Deep residual learning
 # for image recognition. In Proceedings of the IEEE conference on
@@ -15,34 +15,50 @@
 # though only with some help from:
 # https://machinelearningmastery.com/three-ways-to-build-machine-learning-models-in-keras/
 #
-# This gives us a way to build residual networks where the number of
-# filters is constant. If we want to have the usual stack of deepening
-# filters and downsampling blocks, we will have to do the necessary
-# work to modify x before adding to Fx.
+# This gives us a way to build residual networks with different
+# numbers of filters and downsaming (so all the complex cases that
+# elude FirefoxMetzger), making it pretty general. I make no claims of
+# efficiency, but hopefully it is clear.
 
+import math
+import tensorflow as tf
 from keras import layers
 from keras.layers import Layer
+from models.downSampleLayer import DSLayer
 
-# Based on the Keras base layer:
-# https://keras.io/api/layers/base_layer/
+# Initialise with the number of filters and the strides for both
+# convolutional layers, and include kernel so that this can be
+# specified at the network level.
 class Residual(Layer):
-    def __init__(self, filters, kernel,**kwargs):
+    def __init__(self, filters1, filters2, strides1, strides2, kernel,**kwargs):
         super(Residual, self).__init__(**kwargs)
-        self.filters = filters
-        self.kernel = kernel
-        # Here we define the layers within the residual block
-        self.w1_x =      layers.Conv2D(self.filters,
+        # Some parameters
+        self.filters1 = filters1
+        self.filters2 = filters2
+        self.strides1 = strides1
+        self.strides2 = strides2
+        self.kernel   = kernel
+        # Here we define the layers within the residual block, mainly
+        # self-explanatory if you know the standard parts of a ResNet.
+        self.w1_x =      layers.Conv2D(self.filters1,
                                        self.kernel,
+                                       self.strides1,
                                        padding="same")
         # He at al. added BN betwen each convolution layer and the
         # subsequent activation layer
         self.bn_w1_x =    layers.BatchNormalization()   
         self.sigma_w1_x = layers.Activation("relu")
-        self.Fx =         layers.Conv2D( self.filters,
-                                         self.kernel,
-                                         padding="same")
-        self.bn_Fx =      layers.BatchNormalization() 
+        self.Fx =         layers.Conv2D(self.filters2,
+                                        self.kernel,
+                                        self.strides2,
+                                        padding="same")
+        self.bn_Fx =      layers.BatchNormalization()
+        # Needed for downsampling the input before combination.
+        self.ds  =        DSLayer(filters=self.filters2,
+                                  kernel_size=(1, 1),
+                                  strides=self.strides1)
         self.Fx_plus_x =  layers.Add()
+        self.out =        layers.Activation("relu")
         
     # The business part of the layer, which implements the structure
     # from Figure 2 of He et al. (2016). The notation for the
@@ -62,10 +78,23 @@ class Residual(Layer):
         # Followed by BN
         bn_Fx =  self.bn_Fx(Fx)
         # Now add in our residual, which is the unprocessed x (called
-        # the identity in Figure 2)
-        Fx_plus_x = self.Fx_plus_x([bn_Fx, x])
+        # the identity in Figure 2), except that we have to align its
+        # shape with bn_Fx. First we downsample where necessary
+        identity = self.ds(x)
+        # Then we pad the dimensions if needed
+        identity = self.pad(identity, bn_Fx)
+        # Combine x/identity with Fx/bn_Fx
+        Fx_plus_x = self.Fx_plus_x([bn_Fx, identity])
         # One more RELU and we are done
-        return  layers.Activation("relu")(Fx_plus_x)
+        out = self.out(Fx_plus_x)
+        return out
 
-    def compute_output_shape(self, input_shape):
-        return input_shape
+    # Pad the input tensor have the right number of channels. Easier
+    # to get this working than using the padLayer class.
+    def pad(self, x, y):
+        channels1 = tf.keras.backend.int_shape(x)[3]
+        channels2 = tf.keras.backend.int_shape(y)[3]
+        # This was cribbed from:
+        # https://github.com/tflearn/tflearn/blob/master/tflearn/layers/conv.py#L1590
+        ch = (channels2 - channels1)//2
+        return tf.pad(x, [[0, 0], [0, 0], [0, 0], [ch, ch]])

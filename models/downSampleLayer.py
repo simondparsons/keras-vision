@@ -28,11 +28,11 @@ class DSLayer(layers.Conv2D):
     # Everything is done in initialization. Ideally we wouldn't have
     # to pass kernel_size, but this seems to be obligatory. So we
     # ignore whatever value is passed.
-    def __init__(self, filters, kernel_size, strides, name):
+    def __init__(self, filters, kernel_size, strides):
         super(DSLayer, self).__init__(
             filters= filters, 
             strides = strides,
-            name = name,
+            #name = name,
             kernel_size=(1, 1),
             # Set the kernel to be [1]
             kernel_initializer=initializers.Ones(),

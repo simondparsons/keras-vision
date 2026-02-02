@@ -34,8 +34,8 @@ import tensorflow as tf
 # https://keras.io/api/layers/base_layer/
 class PadLayer(Layer):
     
-    def call(self, x, channels1, channels2):
+    def call(self, y, channels1, channels2):
         # This was cribbed from:
         # https://github.com/tflearn/tflearn/blob/master/tflearn/layers/conv.py#L1590
         ch = (channels2 - channels1)//2
-        return tf.pad(x, [[0, 0], [0, 0], [0, 0], [ch, ch]])
+        return tf.pad(y, [[0, 0], [0, 0], [0, 0], [ch, ch]])
