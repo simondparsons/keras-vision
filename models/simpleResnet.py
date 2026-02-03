@@ -31,7 +31,6 @@
 from models.backbone import Backbone
 from models.padLayer import PadLayer
 from tensorflow.keras import layers, models
-import tensorflow as tf
 
 class SimpleResNet(Backbone):
     # Set up some constants that we will use to do this across the
