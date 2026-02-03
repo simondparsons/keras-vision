@@ -57,7 +57,7 @@
 from models.backbone import Backbone
 from models.padLayer import PadLayer
 from models.downSampleLayer import DSLayer
-from tensorflow.keras import layers, models#, initializers
+from tensorflow.keras import layers, models
 
 class ResNet18(Backbone):
     # Set up some constants that we will use to do this across the
