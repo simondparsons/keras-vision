@@ -22,7 +22,8 @@ class MobileNetPretrained(Backbone):
     # pre-specified network.
     
     dropout_rate = 0.5      # drop 50% of neurons
-
+    activation = 'relu'
+    
     def buildModel(self):
         # We start with MobileNet. We load the weights from training on
         # ImageNet, but we don't include the "top", the final classifier
@@ -43,8 +44,9 @@ class MobileNetPretrained(Backbone):
         mobile = base_model(inputs, training=False)
         # Put the result of the MobileNet inference through a standardish output stage
         pooled =  layers.GlobalAveragePooling2D()(mobile)
-        flatten = layers.Flatten()(pooled) 
-        dropout = layers.Dropout(rate=self.dropout_rate)(flatten)
+        flatten = layers.Flatten()(pooled)
+        fcLayer = layers.Dense(1024, activation=self.activation)(flatten)
+        dropout = layers.Dropout(rate=self.dropout_rate)(fcLayer)
         outputs = layers.Dense(self.num_classes,
                               activation='softmax')(dropout)
         self.model = models.Model(inputs, outputs)

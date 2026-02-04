@@ -17,6 +17,7 @@
 
 import string
 import argparse
+import dataLoader
 import numpy as np
 import tensorflow as tf
 from matplotlib import pyplot as plt
@@ -63,6 +64,8 @@ def main():
         (X_train, y_train), (X_test, y_test) = datasets.fashion_mnist.load_data()
     elif dataset == 'cifar10':
         (X_train, y_train), (X_test, y_test) = datasets.cifar10.load_data()
+    elif dataset == 'flowers':
+        (X_train, y_train), (X_test, y_test) = dataLoader.loadData('oxford_flowers102')
     else:
         print("I don't know the dataset:", args.dataset)
         exit(0)

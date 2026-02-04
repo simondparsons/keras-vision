@@ -140,7 +140,7 @@ class SimpleResNet(Backbone):
         # Output stage: Average pooling then flatten and put through a
         # Dense layer with the same number of output units as classes.
         avg_pool = layers.GlobalAveragePooling2D()(b3_relu_2)
-        flatten = layers.Flatten(name="flatten_to_dense")(avg_pool)        
+        flatten = layers.Flatten(name="flatten_to_dense")(avg_pool)
         # He at al. do not use Dropout, but I do for continuity with
         # the other models.
         dropout = layers.Dropout(rate=self.dropout_rate,
