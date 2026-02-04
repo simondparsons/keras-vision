@@ -36,7 +36,7 @@ Note that this paper shows (again) the ambiguity over what counts as "deep" in d
 
 ### SimpleResNet
 
-As the name suggests, a simple ResNet to illustrate how residuals can be handled. A good place ot start understanding the code. Has only 6 convolutional layers: 16 filters, 2 x 32 filters, 2 x 64 filters and 128 filters, followed by a 10 unit FC layer. Despite being in the "needs CUDA" collection, this actually runs ok on a laptop CPU.
+As the name suggests, a simple ResNet to illustrate how residuals can be handled. A good place to start understanding the code. Has only 6 convolutional layers: 16 filters, 2 x 32 filters, 2 x 64 filters and 128 filters, followed by a 10 unit FC layer. Despite being in the "needs CUDA" collection, this actually runs ok on a laptop CPU.
 
 Note that it will only handle grey scale images. The issue is easy to fix (as in ResNet18), but couldn't be bothered to backpropagate it.
 
