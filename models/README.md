@@ -52,3 +52,14 @@ My model of ResNet18 is as complex a network as I want to implement without some
 
 The prototypical model from He et al (see Table 1 and Figure 2) with 34 weight layers, built using the Residual class. The structure has a 64 filter layer (with 7x7 filters) then 6 x 64 filters (3 residual layers), 8 x 128 filters, 12 x 256 filters, 6 x 512 filters, followed by a 10 unit FC layer. As described in the code, this downsamples less than the original ResNet34 so that it works on smaller images.
 
+## MobileNets
+
+As introduced by Howard, A.G., Zhu, M., Chen, B., Kalenichenko, D., Wang, W., Weyand, T., Andreetto, M. and Adam, H., (2017). Mobilenets: Efficient convolutional neural networks for mobile vision applications. arXiv preprint arXiv:1704.04861.
+
+### MobileNet
+
+Exactly as in Howard et al., but taking out the downsampling that would have made it impossible to run on small images (marked in the code and easy to reverse). Using the basic sSequential class approach.
+
+### MobileNetPretrained
+
+An example of how to use the Keras implementation of MobileNet, using ImageNet weights, and with a user-defined output stage.

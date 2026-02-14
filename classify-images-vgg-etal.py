@@ -28,6 +28,7 @@ from models.vgg11 import VGG11
 from models.vgg16 import VGG16
 from models.vgg19 import VGG19
 from models.mobilenetPretrained import MobileNetPretrained
+from models.mobileNet import MobileNet
 from models.simpleResnet import SimpleResNet
 from models.resnet18 import ResNet18
 from models.simpleClassResnet import SimpleClassResNet
@@ -101,6 +102,8 @@ def main():
         network = VGG16(img_shape, num_classes)
     elif arch ==  'VGG19':
         network = VGG19(img_shape, num_classes)
+    elif arch == 'MobileNet':
+        network = MobileNet(img_shape, num_classes)
     elif arch ==  'MobileNetPretrained':
         network = MobileNetPretrained(img_shape, num_classes)
     elif arch ==  'ResNet':
