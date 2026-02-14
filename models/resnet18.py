@@ -1,7 +1,7 @@
 # resnet18.py
 #
 # Simon Parsons
-# 27-01-26
+# 26-01-27
 #
 # Merging the approach I used for simple CNN models, which was based on:
 # https://exowanderer.medium.com/what-is-this-keras-thing-anyways-fe7aa00158ef
@@ -15,7 +15,7 @@
 # for image recognition. In Proceedings of the IEEE Conference on
 # Computer Vision and Pattern Recognition (pp. 770–778).
 #
-# This was written with teahcing in mind, so always aims for clarity
+# This was written with teaching in mind, so always aims for clarity
 # over efficiency. I'm sure that there are many ways it can be optimized.
 #
 # Note that this general approach started from aliprf but uses the
@@ -47,12 +47,8 @@
 # in the network, but since this code was developed for teaching, I
 # wanted to introduce the cases one by one.
 
-# TODO: Build a version with residual blocks defined using a Residual
-# class as in:
-# https://gist.github.com/FirefoxMetzger/6b6ccf4f7c344459507e73bbd13ec541rting from:
-#
-# A starter version is in residual.py, but it doesn't yet work.
-#
+# A ResNet with residual blocks defined using a Residual
+# class can be found in resnet34.py
 
 from models.backbone import Backbone
 from models.padLayer import PadLayer
