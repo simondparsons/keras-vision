@@ -69,6 +69,12 @@ class MobileNet(Backbone):
         # convolutional layer. 6 of these scale from 32 to 512
         # filters, then there are 5 with 512 fliters, then 2 scalling
         # up to 1024.
+
+        #
+        # Note that the original downsamples images to 7x7 before a
+        # 7x7 average pooling layer. For efficiency, this downsamples
+        # our smaller images to 4x4 before the 512 filter layers, and
+        # then average pools over 4 x 4. 
         
         # Block1
         #
@@ -171,9 +177,9 @@ class MobileNet(Backbone):
 
         # Block6
         #
-        # The original downsamples here.
+        # The original downsamples here. 
         self.model.add(layers.DepthwiseConv2D(kernel_size=self.kernel_shape3,
-                                              strides=self.strides,
+                                              strides=self.strides_ds,
                                               padding='same',
                                               name='b6_dw'))
         self.model.add(layers.BatchNormalization(name='b6_bn1'))
@@ -189,13 +195,109 @@ class MobileNet(Backbone):
         self.model.add(layers.Activation('relu', name='b6_act2'))
 
         #
-        # More layers in here
+        # 5 identical layers. No downsampling in the original. 512
+        # filters throughout
+
+        # Block 7
         #
+        self.model.add(layers.DepthwiseConv2D(kernel_size=self.kernel_shape3,
+                                              strides=self.strides,
+                                              padding='same',
+                                              name='b7_dw'))
+        self.model.add(layers.BatchNormalization(name='b7_bn1'))
+        self.model.add(layers.Activation('relu', name='b7_act1'))
+        #
+        # 512 filters.
+        self.model.add(layers.Conv2D(filters=self.nfilters_5,
+                                     kernel_size=self.kernel_shape1,
+                                     strides=self.strides,
+                                     padding=self.padding,
+                                     name='b7_cnv'))
+        self.model.add(layers.BatchNormalization(name='b7_bn2'))
+        self.model.add(layers.Activation('relu', name='b7_act2'))
+
+        # Block 8
+        #
+        self.model.add(layers.DepthwiseConv2D(kernel_size=self.kernel_shape3,
+                                              strides=self.strides,
+                                              padding='same',
+                                              name='b8_dw'))
+        self.model.add(layers.BatchNormalization(name='b8_bn1'))
+        self.model.add(layers.Activation('relu', name='b8_act1'))
+        #
+        # 512 filters.
+        self.model.add(layers.Conv2D(filters=self.nfilters_5,
+                                     kernel_size=self.kernel_shape1,
+                                     strides=self.strides,
+                                     padding=self.padding,
+                                     name='b8_cnv'))
+        self.model.add(layers.BatchNormalization(name='b8_bn2'))
+        self.model.add(layers.Activation('relu', name='b8_act2'))         
+
+        # Block 9
+        #
+        self.model.add(layers.DepthwiseConv2D(kernel_size=self.kernel_shape3,
+                                              strides=self.strides,
+                                              padding='same',
+                                              name='b9_dw'))
+        self.model.add(layers.BatchNormalization(name='b9_bn1'))
+        self.model.add(layers.Activation('relu', name='b9_act1'))
+        #
+        # 512 filters.
+        self.model.add(layers.Conv2D(filters=self.nfilters_5,
+                                     kernel_size=self.kernel_shape1,
+                                     strides=self.strides,
+                                     padding=self.padding,
+                                     name='b9_cnv'))
+        self.model.add(layers.BatchNormalization(name='b9_bn2'))
+        self.model.add(layers.Activation('relu', name='b9_act2'))
+
+        # Block 10
+        #
+        self.model.add(layers.DepthwiseConv2D(kernel_size=self.kernel_shape3,
+                                              strides=self.strides,
+                                              padding='same',
+                                              name='b10_dw'))
+        self.model.add(layers.BatchNormalization(name='b10_bn1'))
+        self.model.add(layers.Activation('relu', name='b10_act1'))
+        #
+        # 512 filters.
+        self.model.add(layers.Conv2D(filters=self.nfilters_5,
+                                     kernel_size=self.kernel_shape1,
+                                     strides=self.strides,
+                                     padding=self.padding,
+                                     name='b10_cnv'))
+        self.model.add(layers.BatchNormalization(name='b10_bn2'))
+        self.model.add(layers.Activation('relu', name='b10_act2'))
+
+        # Block 11
+        #
+        self.model.add(layers.DepthwiseConv2D(kernel_size=self.kernel_shape3,
+                                              strides=self.strides,
+                                              padding='same',
+                                              name='b11_dw'))
+        self.model.add(layers.BatchNormalization(name='b11_bn1'))
+        self.model.add(layers.Activation('relu', name='b11_act1'))
+        #
+        # 512 filters.
+        self.model.add(layers.Conv2D(filters=self.nfilters_5,
+                                     kernel_size=self.kernel_shape1,
+                                     strides=self.strides,
+                                     padding=self.padding,
+                                     name='b11_cnv'))
+        self.model.add(layers.BatchNormalization(name='b11_bn2'))
+        self.model.add(layers.Activation('relu', name='b11_act2'))
+        
+        # 
+        #
+        # 2 more layers in here, increasing the number of filters.
+        #
+
         
         # Output layers.
         # Average pooling with a 7x7 pool is in the original
         self.model.add(layers.AveragePooling2D(name="avpool",
-                                               pool_size=(7, 7)))
+                                               pool_size=(4, 4)))
         self.model.add(layers.Flatten(name="flatten_to_dense"))   
         # Howard at al. do not use Dropout, but I do for continuity with
         # the other models.
