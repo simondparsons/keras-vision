@@ -27,18 +27,21 @@ The paper contains 11, 13, 16 and 19 layer models. This is the 16-layer model wi
 
 The deepest model from the paper. We have 2 x 64 filter layers, 2 x 128 filter layers, 4 x 256 filter layers, 4 x 512 filter layers and another 4 x 512 filter layers, followed by the usual 120 unit FC layer, an 84 unit FC layer and then the 10 unit output layer.
 
+
 ## ResNets
 
 As introduced by:
 He, K., Zhang, X., Ren, S., & Sun, J. (2016). Deep residual learning for image recognition. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (pp. 770–778).
 
-Note that this paper shows (again) the ambiguity over what counts as "deep" in deep learning. The VGG paper refers to a 19 weight-layer network as "very deep", while a year later this paper includes a 152-layer network and doesn't apparently consider that "very" deep (perhaps because, as they report, it has lower complexity than VGG19)
+Note that this paper shows (again) the ambiguity over what counts as "deep" in deep learning. The VGG paper refers to a 19 weight-layer network as "very deep", while a year later this paper includes a 152-layer network and doesn't apparently consider that "very" deep (perhaps because, as they report, it has lower complexity than VGG19).
+
+From an implementation perspective we have to move away from the Sequential class definition approach to defining networks (see https://machinelearningmastery.com/three-ways-to-build-machine-learning-models-in-keras/) because the residual pass-through creates a branching network. The follwoing networks show how to do this sing first the functional approach to defining networks and then the class-based approach (which I think is neatest fo rlarg enetworks but less clear).
 
 ### SimpleResNet
 
 As the name suggests, a simple ResNet to illustrate how residuals can be handled. A good place to start understanding the code. Has only 6 convolutional layers: 16 filters, 2 x 32 filters, 2 x 64 filters and 128 filters, followed by a 10 unit FC layer. Despite being in the "needs CUDA" collection, this actually runs ok on a laptop CPU.
 
-Note that it will only handle grey scale images. The issue is easy to fix (as in ResNet18), but couldn't be bothered to backpropagate it.
+Note that it will only handle grey scale images. The issue is easy to fix (as in ResNet18), but I couldn't be bothered to backpropagate the fix once I figured it out.
 
 ### ResNet18
 
@@ -52,14 +55,6 @@ My model of ResNet18 is as complex a network as I want to implement without some
 
 The prototypical model from He et al (see Table 1 and Figure 2) with 34 weight layers, built using the Residual class. The structure has a 64 filter layer (with 7x7 filters) then 6 x 64 filters (3 residual layers), 8 x 128 filters, 12 x 256 filters, 6 x 512 filters, followed by a 10 unit FC layer. As described in the code, this downsamples less than the original ResNet34 so that it works on smaller images.
 
-## MobileNets
+### Further ResNets
 
-As introduced by Howard, A.G., Zhu, M., Chen, B., Kalenichenko, D., Wang, W., Weyand, T., Andreetto, M. and Adam, H., (2017). Mobilenets: Efficient convolutional neural networks for mobile vision applications. arXiv preprint arXiv:1704.04861.
-
-### MobileNet
-
-Exactly as in Howard et al., but taking out the downsampling that would have made it impossible to run on small images (marked in the code and easy to reverse). Using the basic sSequential class approach.
-
-### MobileNetPretrained
-
-An example of how to use the Keras implementation of MobileNet, using ImageNet weights, and with a user-defined output stage.
+This is as much as I needed for teaching, so I stopped here. Deeper ResNets need the bottleneck building block from (He et al. 2016, Figure 5) which I may get to at some point.

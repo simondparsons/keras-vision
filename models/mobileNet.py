@@ -6,7 +6,7 @@
 # Merging the approach I used for simple CNN models, which was based on:
 # https://exowanderer.medium.com/what-is-this-keras-thing-anyways-fe7aa00158ef
 #
-# and drawing heavily on:
+# and drawing heavily on the version of MobileNet here:
 # https://github.com/arthurdouillard/keras-mobilenet/blob/master/mobilenet.py
 #
 # we have an implmentation of MobileNetv1as defined in:
@@ -21,7 +21,7 @@
 # as with other models in this set, I have opted for (what I think is)
 # the clearest way of doing things.
 
-# For comparison with other models, this is equivalent to an N layer
+# For comparison with other models, this is equivalent to an 14 layer
 # model built with standard n x n (n > 1) convolutions.
 
 from models.backbone import Backbone
@@ -64,17 +64,16 @@ class MobileNet(Backbone):
         self.model.add(layers.BatchNormalization(name='bn_1'))
         self.model.add(layers.ReLU(name='relu_1'))
 
-        # There are now 13 blocks of depthwise+pontwise convolution,
+        # There are now 13 blocks of depthwise+pointwise convolution,
         # each equivalent in some sense to a single conventional
         # convolutional layer. 6 of these scale from 32 to 512
         # filters, then there are 5 with 512 fliters, then 2 scalling
         # up to 1024.
-
         #
         # Note that the original downsamples images to 7x7 before a
         # 7x7 average pooling layer. For efficiency, this downsamples
-        # our smaller images to 4x4 before the 512 filter layers, and
-        # then average pools over 4 x 4. 
+        # our smaller images to 2x2 before the 512 filter layers, and
+        # then average pools over 2x2. 
         
         # Block1
         #
@@ -138,10 +137,9 @@ class MobileNet(Backbone):
 
         # Block4
         #
-        # The original downsamples here, but that is not possible for
-        # our little imagaes.
+        # The original downsamples here.
         self.model.add(layers.DepthwiseConv2D(kernel_size=self.kernel_shape3,
-                                              strides=self.strides,
+                                              strides=self.strides_ds,
                                               padding='same',
                                               name='b4_dw'))
         self.model.add(layers.BatchNormalization(name='b4_bn1'))
@@ -287,17 +285,48 @@ class MobileNet(Backbone):
                                      name='b11_cnv'))
         self.model.add(layers.BatchNormalization(name='b11_bn2'))
         self.model.add(layers.Activation('relu', name='b11_act2'))
-        
-        # 
-        #
-        # 2 more layers in here, increasing the number of filters.
-        #
 
-        
-        # Output layers.
-        # Average pooling with a 7x7 pool is in the original
+        # Block 12
+        #
+        self.model.add(layers.DepthwiseConv2D(kernel_size=self.kernel_shape3,
+                                              strides=self.strides,
+                                              padding='same',
+                                              name='b12_dw'))
+        self.model.add(layers.BatchNormalization(name='b12_bn1'))
+        self.model.add(layers.Activation('relu', name='b12_act1'))
+        #
+        # 1024 filters.
+        self.model.add(layers.Conv2D(filters=self.nfilters_6,
+                                     kernel_size=self.kernel_shape1,
+                                     strides=self.strides,
+                                     padding=self.padding,
+                                     name='b12_cnv'))
+        self.model.add(layers.BatchNormalization(name='b12_bn2'))
+        self.model.add(layers.Activation('relu', name='b12_act2'))
+
+        # Block 13
+        #
+        self.model.add(layers.DepthwiseConv2D(kernel_size=self.kernel_shape3,
+                                              strides=self.strides,
+                                              padding='same',
+                                              name='b13_dw'))
+        self.model.add(layers.BatchNormalization(name='b13_bn1'))
+        self.model.add(layers.Activation('relu', name='b13_act1'))
+        #
+        # 1024 filters.
+        self.model.add(layers.Conv2D(filters=self.nfilters_6,
+                                     kernel_size=self.kernel_shape1,
+                                     strides=self.strides,
+                                     padding=self.padding,
+                                     name='b13_cnv'))
+        self.model.add(layers.BatchNormalization(name='b13_bn2'))
+        self.model.add(layers.Activation('relu', name='b13_act2'))
+                
+        # Output layers.  Average pooling with a 7x7 pool is in the
+        # original which has reduced the images to 7x7 at this point.
+        # Our smaller images are reduced to 2x2 here.
         self.model.add(layers.AveragePooling2D(name="avpool",
-                                               pool_size=(4, 4)))
+                                               pool_size=(2, 2)))
         self.model.add(layers.Flatten(name="flatten_to_dense"))   
         # Howard at al. do not use Dropout, but I do for continuity with
         # the other models.
