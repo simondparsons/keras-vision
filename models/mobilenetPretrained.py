@@ -44,8 +44,7 @@ class MobileNetPretrained(Backbone):
         mobile = base_model(inputs, training=False)
         # Put the result of the MobileNet inference through a standardish output stage
         pooled =  layers.GlobalAveragePooling2D()(mobile)
-        flatten = layers.Flatten()(pooled)
-        fcLayer = layers.Dense(1024, activation=self.activation)(flatten)
+        fcLayer = layers.Dense(1024, activation=self.activation)(pooled)
         dropout = layers.Dropout(rate=self.dropout_rate)(fcLayer)
         outputs = layers.Dense(self.num_classes,
                               activation='softmax')(dropout)
