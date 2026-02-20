@@ -92,7 +92,6 @@ class SimpleClassResNet(Backbone):
         #
         # Average Pooling, then through an FC layer with one neuron per class.
         self.model.add(layers.GlobalAveragePooling2D(name="avpool"))
-        self.model.add(layers.Flatten(name="flatten_to_dense"))
         self.model.add(layers.Dropout(rate=self.dropout_rate,
                                       name="dropout_from_dense_to_output"))
         self.model.add(layers.Dense(self.num_classes,

@@ -66,8 +66,10 @@ def main():
     elif dataset == 'cifar10':
         (X_train, y_train), (X_test, y_test) = datasets.cifar10.load_data()
     elif dataset == 'flowers':
+        # Flowers has a test split
         (X_train, y_train), (X_test, y_test) = dataLoader.loadData('oxford_flowers102', True)
     elif dataset == 'leaves':
+        # Leaves does not
         (X_train, y_train), (X_test, y_test) = dataLoader.loadData('plant_village', False)
     else:
         print("I don't know the dataset:", args.dataset)
