@@ -12,8 +12,8 @@
 # but modified to call different networks and to use command line
 # arguments.
 #
-# This is a pretty minor edit of classify-images-keras.py from my
-# basic-vision repo.
+# This started as a pretty minor edit of classify-images-keras.py from my
+# basic-vision repo, but grew the ability to do batch runs with --experiments.
 
 import string
 import argparse
@@ -23,6 +23,7 @@ import tensorflow as tf
 from matplotlib import pyplot as plt
 from tensorflow.keras import layers, callbacks, utils, datasets, models
 from operator import itemgetter
+from experiments import runExperiments
 # These are the architectures available roughly in order of complexity.
 from models.vgg11 import VGG11
 from models.vgg16 import VGG16
@@ -52,8 +53,12 @@ def main():
     # Batch size, in case we need to adjust this
     parser.add_argument('--batch_size', help='Specify batch size', default=64)
     # Patience, in case we need to adjust this
-    parser.add_argument('--patience', help='How many epochs to wait before invoking early stopping ', default=3)
-
+    parser.add_argument('--patience', help='How many epochs to wait before invoking early stopping', default=3)
+    # Experiments, an option n case we want to run this in batch mode.
+    parser.add_argument('--experiments', help='How many iterations of the setup we want to run', default=1)
+    # Output file, only used if we are running experiments in batch mode
+    parser.add_argument('--out_file', help='Output file', default='training_results.csv')
+    
     args = parser.parse_args()
 
     # Load the data from TensorFlow. 
@@ -123,80 +128,93 @@ def main():
     else:
         print("I don't know the model:", args.model)
         exit(0)
-    
-    network.buildModel()
-    print(network.model.name)
-    model = network.model
-    # Print a summary of the model
-    model.summary()
 
-    # Now compile the model
-    model.compile(
-        loss="categorical_crossentropy",
-        optimizer="adam",
-        metrics=["accuracy"]
-    )
+    # From here we do things differently depending on whether we are
+    # running this once, or running things multiple times in
+    # "experiment" mode.
 
-    # Train the model.
-    #
-    # epochs:           How many iterations should we cycle over
-    #                   the entire MNIST dataset
+    # First we set some of the hyperparameters
     # validation_split: How many images to hold out per epoch
     # batch size:       Could be 32, 64, 128, 256, 512
-    # early_stopping:   When to stop training if performance plateaus.
-    
     validation_split = 0.1  
-    batch_size = 64 # The larger the batch size, the more memory a
-                    # given dataset uses.
+    batch_size = args.batch_size # The larger the batch size, the more
+                                 # memory a given dataset uses.
+                                 
+    if args.experiments == 1:
 
-    # If we have specified the number of epochs, then run for that
-    # number irrespective of the way that training goes. Otherwise do
-    # early stopping after validation error hadn't improved for
-    # patience=3 epochs.
-    if args.epochs:
-        history = model.fit(
-            x=X_train,
-            y=y_train,
-            batch_size=batch_size,
-            epochs=int(args.epochs),
-            # The alternative is to explicitly set validation_data 
-            validation_split = validation_split,
+        # Build model and print summary
+        network.buildModel()
+        print(network.model.name)
+        model = network.model
+        model.summary()
+
+        # Now compile the model
+        model.compile(
+            loss="categorical_crossentropy",
+            optimizer="adam",
+            metrics=["accuracy"]
         )
-    else:
-        early_stopping = callbacks.EarlyStopping(patience=int(args.patience))
-        history = model.fit(
-            x=X_train,
-            y=y_train,
-            batch_size=batch_size,
-            epochs=50,
-            validation_split = validation_split,
-            callbacks=[early_stopping]
-        )
-
-    # Show the change in accuracy and loss over training.
-    if args.display == 'y' or args.display == 'yes':
-        epochs = np.arange(len(history.history['loss']))
-
-        fig, (ax1, ax2) = plt.subplots(nrows=2, figsize=(15,10))
-        ax1.plot(epochs, history.history['loss'], 'o-', label='Training Loss')
-        ax1.plot(epochs, history.history['val_loss'], 'o-', label='Validation Loss')
-        ax1.legend()
     
-        ax2.plot(epochs, history.history['accuracy'], 'o-', label='Training Accuracy')
-        ax2.plot(epochs, history.history['val_accuracy'], 'o-', label='Validation Accuracy')
-        ax2.legend()
+        # If we have specified the number of epochs, then run for that
+        # number irrespective of the way that training goes. Otherwise do
+        # early stopping after validation error hadn't improved for
+        # patience=3 epochs.
+        if args.epochs:
+            history = model.fit(
+                x=X_train,
+                y=y_train,
+                batch_size=batch_size,
+                epochs=int(args.epochs),
+                # The alternative is to explicitly set validation_data 
+                validation_split = validation_split,
+            )
+        else:
+            early_stopping = callbacks.EarlyStopping(patience=int(args.patience))
+            history = model.fit(
+                x=X_train,
+                y=y_train,
+                batch_size=batch_size,
+                epochs=50,
+                validation_split = validation_split,
+                callbacks=[early_stopping]
+            )
 
-        plt.show()
+        # Show the change in accuracy and loss over training.
+        if args.display == 'y' or args.display == 'yes':
+            epochs = np.arange(len(history.history['loss']))
+                
+            fig, (ax1, ax2) = plt.subplots(nrows=2, figsize=(15,10))
+            ax1.plot(epochs, history.history['loss'], 'o-', label='Training Loss')
+            ax1.plot(epochs, history.history['val_loss'], 'o-', label='Validation Loss')
+            ax1.legend()
+    
+            ax2.plot(epochs, history.history['accuracy'], 'o-', label='Training Accuracy')
+            ax2.plot(epochs, history.history['val_accuracy'], 'o-', label='Validation Accuracy')
+            ax2.legend()
 
-    test_score = model.evaluate(X_test, y_test, verbose=0)
-    train_score = model.evaluate(X_train, y_train, verbose=0)
+            plt.show()
 
-    print("Train loss     :", train_score[0])
-    print("Train accuracy :", train_score[1])
-    print()
-    print("Test loss      :", test_score[0])
-    print("Test accuracy  :", test_score[1])
+        test_score = model.evaluate(X_test, y_test, verbose=0)
+        train_score = model.evaluate(X_train, y_train, verbose=0)
 
+        print("Train loss     :", train_score[0])
+        print("Train accuracy :", train_score[1])
+        print()
+        print("Test loss      :", test_score[0])
+        print("Test accuracy  :", test_score[1])
+
+    # Now we are running the same training multiple times and storing the results
+    else:
+        runExperiments(network, 
+                       X_train, y_train,
+                       X_test, y_test,
+                       args.batch_size,
+                       args.epochs,
+                       args.patience,
+                       validation_split=0.1,
+                       runs=int(args.experiments),
+                       out_file=args.out_file
+        )
     return 0
 
 if __name__ == "__main__":
