@@ -49,13 +49,13 @@ def main():
     # you don't specify the script will run 50 epochs with early
     # stopping (which for the 3 simple datsets has rarely been more
     # than 20).
-    parser.add_argument('--epochs', help='Specify number of epochs')
+    parser.add_argument('--epochs', help='Specify number of epochs', default=None)
     # Batch size, in case we need to adjust this
     parser.add_argument('--batch_size', help='Specify batch size', default=64)
     # Patience, in case we need to adjust this
-    parser.add_argument('--patience', help='How many epochs to wait before invoking early stopping', default=3)
+    parser.add_argument('--patience', help='How many epochs before invoking early stopping', default=3)
     # Experiments, an option n case we want to run this in batch mode.
-    parser.add_argument('--experiments', help='How many iterations of the setup we want to run', default=1)
+    parser.add_argument('--experiments', help='How many iterations of the setup we want to run', default=None)
     # Output file, only used if we are running experiments in batch mode
     parser.add_argument('--out_file', help='Output file', default='training_results.csv')
     
@@ -140,7 +140,7 @@ def main():
     batch_size = args.batch_size # The larger the batch size, the more
                                  # memory a given dataset uses.
                                  
-    if args.experiments == 1:
+    if args.experiments is None:
 
         # Build model and print summary
         network.buildModel()
@@ -203,7 +203,10 @@ def main():
         print("Test loss      :", test_score[0])
         print("Test accuracy  :", test_score[1])
 
-    # Now we are running the same training multiple times and storing the results
+    # Now we are running the same training multiple times and storing
+    # the results. runExperiments replicates the above calls, but
+    # within a loop controlled by args.experiments, and puts the
+    # results in args.out_file.
     else:
         runExperiments(network, 
                        X_train, y_train,
