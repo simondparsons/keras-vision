@@ -27,12 +27,12 @@ def runExperiments(
         seed=None
     ):
     """
-    model_fn: a function that returns a NEW compiled model each run.
+    network: class to create the relevant network.
     X_train, y_train: training arrays
     X_test, y_test: test arrays (held out)
     batch_size: batch size for .fit(), passed as a string.
     epochs: number of epochs, passed as a string
-    patience: how long to tolerate increasing validation error, passed as a string
+    patience: how many epocjhs before invoking early stopping, passed as a string
     validation_split: passed to .fit()
     runs: number of repeated training runs
     out_file: CSV file to write results to
@@ -97,17 +97,16 @@ def runExperiments(
                 "run": run,
                 "epoch": epoch + 1
             }
-
+            
             # Training + validation metrics
             for key, values in hist.items():
                 record[key] = values[epoch]
 
             # Add test metrics (same for every epoch of run)
             record.update(test_metrics_dict)
-
             all_records.append(record)
 
-    # Convert to dataframe
+    # After runs, convert records to dataframe
     df = pd.DataFrame(all_records)
 
     # Add timestamped filename
