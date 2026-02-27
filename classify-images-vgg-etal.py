@@ -64,12 +64,14 @@ def main():
     # Load the data from TensorFlow. 
     #
     dataset = args.dataset
+    # Datasets that are built-in to Keras/TF
     if dataset == 'mnist':
         (X_train, y_train), (X_test, y_test) = datasets.mnist.load_data()
     elif dataset == 'fashion_mnist':
         (X_train, y_train), (X_test, y_test) = datasets.fashion_mnist.load_data()
     elif dataset == 'cifar10':
         (X_train, y_train), (X_test, y_test) = datasets.cifar10.load_data()
+    # Datasets for which Keras/TF has functions to download from external sites
     elif dataset == 'flowers':
         # Flowers has a test split
         (X_train, y_train), (X_test, y_test) = dataLoader.loadData('oxford_flowers102', True)
@@ -139,7 +141,8 @@ def main():
     validation_split = 0.1  
     batch_size = args.batch_size # The larger the batch size, the more
                                  # memory a given dataset uses.
-                                 
+
+    # Where there is no --experiments switch, we run as we did in basic-vision
     if args.experiments is None:
 
         # Build model and print summary
@@ -207,6 +210,9 @@ def main():
     # the results. runExperiments replicates the above calls, but
     # within a loop controlled by args.experiments, and puts the
     # results in args.out_file.
+    #
+    # Note that running with --experiments 1 is a way of effectively
+    # running the above but also storing the results.
     else:
         runExperiments(network, 
                        X_train, y_train,
