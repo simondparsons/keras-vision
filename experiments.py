@@ -7,6 +7,10 @@
 # University of Lincoln
 # 26-02-25
 
+# Note that this doesn't currently work for models defined using the
+# simple Sequential model definition. On the second run it violates
+# the "unique names" requirement for layers.
+ 
 # Based heavily on suggestions from CoPilot
 import numpy as np
 import pandas as pd
@@ -31,8 +35,8 @@ def runExperiments(
     X_train, y_train: training arrays
     X_test, y_test: test arrays (held out)
     batch_size: batch size for .fit(), passed as a string.
-    epochs: number of epochs, passed as a string
-    patience: how many epocjhs before invoking early stopping, passed as a string
+    epochs: number of epochs, passed as a string (either None or a string representing an int)
+    patience: how many epochs before invoking early stopping, passed as a string
     validation_split: passed to .fit()
     runs: number of repeated training runs
     out_file: CSV file to write results to
@@ -40,7 +44,8 @@ def runExperiments(
     """
     
     all_records = []   # list of dictionaries → becomes DataFrame
-
+    all_summaries = [] # one for every epoch, one summarizing over a run.
+    
     for run in range(1, runs + 1):
         print(f"\n===== Starting run {run}/{runs} =====")
 
@@ -62,9 +67,8 @@ def runExperiments(
         )
         
         # Train. As in the parent file, we do this differently
-        # depending on whether we have specified opchs or are using
+        # depending on whether we have specified epochs or are using
         # patience.
-
         if epochs:
             history = model.fit(
                 x=X_train,
@@ -86,34 +90,54 @@ def runExperiments(
             )
 
         # Evaluate on test set
-        test_metrics = model.evaluate(X_test, y_test, verbose=0)
-        metric_names = model.metrics_names
-        test_metrics_dict = {f"test_{name}": value for name, value in zip(metric_names, test_metrics)}
+        test_metrics = model.evaluate(X_test, y_test, verbose=0, return_dict=True)
 
-        # Store per-epoch results
-        hist = history.history
+        # Print test metrics
+        print("Test loss      :", test_metrics['loss'])
+        print("Test accuracy  :", test_metrics['accuracy'])
+
+        d = {'x':1, 'y':2, 'z':3}
+        d1 = {'x':'a', 'y':'b', 'z':'c'}
+        # Store per-epoch results. These are pulled from the history
+        # and will differ from those reported while the model is
+        # training.
+        hist = history.history  # dict of lists: { "loss": [...], "accuracy": [...], ... }
         for epoch in range(int(epochs)):
-            record = {
-                "run": run,
-                "epoch": epoch + 1
-            }
+            record = {"run": run, "epoch": epoch + 1}
             
             # Training + validation metrics
             for key, values in hist.items():
                 record[key] = values[epoch]
 
-            # Add test metrics (same for every epoch of run)
-            record.update(test_metrics_dict)
             all_records.append(record)
 
+        # Store one summary row per run
+        run_summary = {"run": run}
+        run_summary.update(test_metrics)
+        for k, v in hist.items():
+            if len(v) > 0:
+                run_summary[f"final_{k}"] = v[-1]
+        all_summaries.append(run_summary)
+
     # After runs, convert records to dataframe
-    df = pd.DataFrame(all_records)
+    df_epochs = pd.DataFrame(all_records)
+    df_summary = pd.DataFrame(all_summaries)
+    # Update df column names so that test values are clear in the CSV file
+    df_summary.columns = ['run', 'test accuracy', 'test loss', 'final_accuracy', 'final_loss', 'final_val_accuracy', 'final_val_loss']
 
-    # Add timestamped filename
+    # Timestamp filenames to avoid over-writing. We put the per epoch
+    # results in out_file and create an additional _summary file for
+    # the summary results.
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"{os.path.splitext(out_file)[0]}_{timestamp}.csv"
+    filename_epoch = f"{os.path.splitext(out_file)[0]}_{timestamp}.csv"
+    out_file_summary = f"{os.path.splitext(out_file)[0]}_{"summary"}.csv"
+    filename_summary = f"{os.path.splitext(out_file_summary)[0]}_{timestamp}.csv"
 
-    df.to_csv(filename, index=False)
-    print(f"\nAll results saved to: {filename}")
+    # Save to disk
+    df_epochs.to_csv(filename_epoch, index=False)
+    df_summary.to_csv(filename_summary, index=False)
 
-    return df
+    print(f"\nPer-epoch results saved to: {filename_epoch}")
+    print(f"Per-run summary saved to:  {filename_summary}")
+
+    return df_epochs, df_summary
