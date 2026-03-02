@@ -12,8 +12,9 @@
 # but modified to call different networks and to use command line
 # arguments.
 #
-# This started as a pretty minor edit of classify-images-keras.py from my
-# basic-vision repo, but grew the ability to do batch runs with --experiments.
+# This started as a pretty minor edit of classify-images-keras.py from
+# my basic-vision repo, but grew the ability to do batch runs with
+# --experiments and ended up inclduing a number of other improvements.
 
 import string
 import argparse
@@ -24,7 +25,9 @@ from matplotlib import pyplot as plt
 from tensorflow.keras import layers, callbacks, utils, datasets, models
 from operator import itemgetter
 from experiments import runExperiments
-# These are the architectures available roughly in order of complexity.
+# These are the architectures available roughly in order of
+# complexity. We include LeNet to have a simple model for testing.
+from models.lenet import LeNet
 from models.vgg11 import VGG11
 from models.vgg16 import VGG16
 from models.vgg19 import VGG19
@@ -107,7 +110,9 @@ def main():
     # Input the model description
     arch = args.model
 
-    if arch == 'VGG11':
+    if arch == 'LeNet':
+        network = LeNet(img_shape, num_classes)
+    elif arch == 'VGG11':
         network = VGG11(img_shape, num_classes)
     elif arch == 'VGG16':
         network = VGG16(img_shape, num_classes)
@@ -197,14 +202,15 @@ def main():
 
             plt.show()
 
-        test_score = model.evaluate(X_test, y_test, verbose=0)
-        train_score = model.evaluate(X_train, y_train, verbose=0)
-
-        print("Train loss     :", train_score[0])
-        print("Train accuracy :", train_score[1])
+        # A better way to do this using dictionaries
+        test_score = model.evaluate(X_test, y_test, verbose=0, return_dict=True)
+        train_score = model.evaluate(X_train, y_train, verbose=0, return_dict=True)
+        
+        print("Train loss     :", train_score['loss'])
+        print("Train accuracy :", train_score['accuracy'])
         print()
-        print("Test loss      :", test_score[0])
-        print("Test accuracy  :", test_score[1])
+        print("Test loss      :", test_score['loss'])
+        print("Test accuracy  :", test_score['accuracy'])
 
     # Now we are running the same training multiple times and storing
     # the results. runExperiments replicates the above calls, but
@@ -224,6 +230,9 @@ def main():
                        runs=int(args.experiments),
                        out_file=args.out_file
         )
+
+    # runExperiments returns summary information as Pandas dataframes,
+    # but we are not capturing or using it
     return 0
 
 if __name__ == "__main__":
