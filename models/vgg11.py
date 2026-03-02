@@ -48,13 +48,12 @@ class VGG11(Backbone):
     # Define how we will build the model
     model = models.Sequential(name='VGG11')
 
+    # Note the absence of names to allow us to run experiments using experiments.py
     def buildModel(self):
         # Create the input layer to understand the shape of each image and batch-size 
         self.model.add(
             layers.Input(
-                shape=self.img_shape,
-                # batch_size=batch_size,
-                name='Image_Batch_Input_Layer',
+                shape=self.img_shape
             )
         )
 
@@ -74,22 +73,19 @@ class VGG11(Backbone):
                 kernel_size=self.kernel_shape,
                 activation=self.activation,
                 padding=self.padding,
-                strides=self.strides,
-                name='Conv2D_Layer_11'
+                strides=self.strides
             )
         )
         # A batch normalization layer
         self.model.add(
             layers.BatchNormalization(
-                name='Batch_Norm_Layer_1'
             )
         )
         # Reduce the dimensionality after the first Conv-layer w/
         # MaxPool2D
         self.model.add(
             layers.MaxPooling2D(
-                pool_size=self.pool_shape,
-                name="MaxPool2D_Layer_1"
+                pool_size=self.pool_shape
             )
         )
 
@@ -101,22 +97,19 @@ class VGG11(Backbone):
                 kernel_size=self.kernel_shape,
                 activation=self.activation,
                 padding=self.padding,
-                strides=self.strides,
-                name='Conv2D_Layer_21'
+                strides=self.strides
             )
         )
         # Another batch normalization layer. 
         self.model.add(
             layers.BatchNormalization(
-                name='Batch_Norm_Layer_2'
             )
         )
         # Reduce the dimensionality after the second Conv-layer w/
         # MaxPool2D
         self.model.add(
             layers.MaxPooling2D(
-                pool_size=self.pool_shape,
-                name="MaxPool2D_Layer_2"
+                pool_size=self.pool_shape
             )
         )
 
@@ -128,8 +121,7 @@ class VGG11(Backbone):
                 kernel_size=self.kernel_shape,
                 activation=self.activation,
                 padding=self.padding,
-                strides=self.strides,
-                name='Conv2D_Layer_31'
+                strides=self.strides
             )
         )
         self.model.add(
@@ -138,22 +130,19 @@ class VGG11(Backbone):
                 kernel_size=self.kernel_shape,
                 activation=self.activation,
                 padding=self.padding,
-                strides=self.strides,
-                name='Conv2D_Layer_32'
+                strides=self.strides
             )
         )
         # Another batch normalization layer. 
         self.model.add(
             layers.BatchNormalization(
-                name='Batch_Norm_Layer_3'
             )
         )
         # Reduce the dimensionality after the third Conv-layer w/
         # MaxPool2D
         self.model.add(
             layers.MaxPooling2D(
-                pool_size=self.pool_shape,
-               name="MaxPool2D_Layer_3"
+                pool_size=self.pool_shape
             )
         )
 
@@ -165,8 +154,7 @@ class VGG11(Backbone):
                 kernel_size=self.kernel_shape,
                 activation=self.activation,
                 padding=self.padding,
-                strides=self.strides,
-                name='Conv2D_Layer_41'
+                strides=self.strides
             )
         )
         self.model.add(
@@ -175,28 +163,24 @@ class VGG11(Backbone):
                 kernel_size=self.kernel_shape,
                 activation=self.activation,
                 padding=self.padding,
-                strides=self.strides,
-                name='Conv2D_Layer_42'
+                strides=self.strides
             )
         )
         # Another batch normalization layer. 
         self.model.add(
             layers.BatchNormalization(
-                name='Batch_Norm_Layer_4'
             )
         )
         # The size after 4 layers is just 2x2, so don't pool any
-        # more.withthis layer in place, the final feature map is just
-        # 1x1 if we start with 32x32 images.
-        #
-        # Need to remove for 28x28 images
+        # more. With this layer in place, the final feature map is
+        # just 1x1 if we start with 32x32 images, and the model will
+        # crash with 28x28 images
         #
         # Reduce the dimensionality after the fourth Conv-layer w/
         # MaxPool2D
         #self.model.add(
         #    layers.MaxPooling2D(
-        #        pool_size=self.pool_shape,
-        #       name="MaxPool2D_Layer_4"
+        #        pool_size=self.pool_shape
         #    )
         #)
 
@@ -208,8 +192,7 @@ class VGG11(Backbone):
                 kernel_size=self.kernel_shape,
                 activation=self.activation,
                 padding=self.padding,
-                strides=self.strides,
-                name='Conv2D_Layer_51'
+                strides=self.strides
             )
         )
         self.model.add(
@@ -218,22 +201,19 @@ class VGG11(Backbone):
                 kernel_size=self.kernel_shape,
                 activation=self.activation,
                 padding=self.padding,
-                strides=self.strides,
-                name='Conv2D_Layer_52'
+                strides=self.strides
             )
         )
         # Another batch normalization layer. 
         self.model.add(
             layers.BatchNormalization(
-                name='Batch_Norm_Layer_5'
             )
         )
         # Reduce the dimensionality after the fourth Conv-layer w/
         # MaxPool2D
         self.model.add(
             layers.MaxPooling2D(
-                pool_size=self.pool_shape,
-               name="MaxPool2D_Layer_5"
+                pool_size=self.pool_shape
             )
         )
 
@@ -241,15 +221,13 @@ class VGG11(Backbone):
         # label prediction
         self.model.add(
             layers.Flatten(
-                name="Flatten_from_Conv2D_to_Dense"
             )
         )
         # Dropout 50% of the neurons from the Conv+Flatten layers to
         # regulate
         self.model.add(
             layers.Dropout(
-                rate=self.dropout_rate,
-                name="Dropout_from_Flatten_to_Dense"
+                rate=self.dropout_rate
             )
         )
 
@@ -259,29 +237,25 @@ class VGG11(Backbone):
         self.model.add(
             layers.Dense(
                 units=120,
-                activation=self.activation,
-                name="Dense_Layer_1"
+                activation=self.activation
             )
         )
         # Dropout 50% between Dense layers
         self.model.add(
             layers.Dropout(
-                rate=self.dropout_rate,
-                name="Dropout_from_Dense_to_Dense_1"
+                rate=self.dropout_rate
             )
         )
         self.model.add(
             layers.Dense(
                 units=84,
-                activation=self.activation,
-                name="Dense_Layer_2"
+                activation=self.activation
             )
         )
         # Dropout 50% between Dense layers
         self.model.add(
             layers.Dropout(
-                rate=self.dropout_rate,
-                name="Dropout_from_Dense_to_Dense_2"
+                rate=self.dropout_rate
             )
         )
         # Compute the weighted-logistic for each possible label in
@@ -289,7 +263,6 @@ class VGG11(Backbone):
         self.model.add(
             layers.Dense(
                 units=self.num_classes, #10 classes in MNIST etc
-                activation="softmax",
-                name="n-Dimensional_Logistic_Output_Layer"
+                activation="softmax"
             )
         )

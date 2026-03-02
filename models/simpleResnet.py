@@ -151,7 +151,7 @@ class SimpleResNet(Backbone):
                               activation='softmax')(dropout)
 
         # This is where we explicitly build the model.
-        self.model = models.Model(input, output)#(name='Simple_ResNet')
+        self.model = models.Model(input, output, name='SimpleResNet')
 
 
 

@@ -306,7 +306,7 @@ class ResNet18(Backbone):
                               activation='softmax')(dropout)
 
         # This is where we explicitly build the model.
-        self.model = models.Model(input, output)#(name='ResNet18')
+        self.model = models.Model(input, output, name='ResNet18')
 
 
 

@@ -76,4 +76,4 @@ class LeNet(Backbone):
             units=self.num_classes,
             activation="softmax")(x)
 
-        self.model = models.Model(input, output ,name='LeNet_Reconstruction')
+        self.model = models.Model(input, output, name='LeNet_functional')

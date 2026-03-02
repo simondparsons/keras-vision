@@ -48,4 +48,4 @@ class MobileNetPretrained(Backbone):
         dropout = layers.Dropout(rate=self.dropout_rate)(fcLayer)
         outputs = layers.Dense(self.num_classes,
                               activation='softmax')(dropout)
-        self.model = models.Model(inputs, outputs)
+        self.model = models.Model(inputs, outputs, name='MobileNetPretrained')
