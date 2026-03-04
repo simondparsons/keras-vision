@@ -14,7 +14,7 @@
 #
 # This started as a pretty minor edit of classify-images-keras.py from
 # my basic-vision repo, but grew the ability to do batch runs with
-# --experiments and ended up inclduing a number of other improvements.
+# --experiments and ended up including a number of other improvements.
 
 import string
 import argparse
@@ -220,7 +220,7 @@ def main():
     # Note that running with --experiments 1 is a way of effectively
     # running the above but also storing the results.
     else:
-        runExperiments(network, 
+        runExperiments(network,
                        X_train, y_train,
                        X_test, y_test,
                        args.batch_size,

@@ -6,15 +6,14 @@
 # Simon Parsons
 # University of Lincoln
 # 26-02-25
-
-# Note that this doesn't currently work for models defined using the
-# simple Sequential model definition. On the second run it violates
-# the "unique names" requirement for layers.
  
-# Based heavily on suggestions from CoPilot
+# Based heavily on suggestions from CoPilot (albeit that CoPilot wrote
+# code that would not work for Sequential models).
+
 import numpy as np
 import pandas as pd
 import tensorflow as tf
+import keras.backend as K
 import os
 from datetime import datetime
 
@@ -31,7 +30,7 @@ def runExperiments(
         seed=None
     ):
     """
-    network: class to create the relevant network.
+    arch: type of network to use.
     X_train, y_train: training arrays
     X_test, y_test: test arrays (held out)
     batch_size: batch size for .fit(), passed as a string.
@@ -42,23 +41,32 @@ def runExperiments(
     out_file: CSV file to write results to
     seed: optional initial random seed for reproducibility
     """
-    
+        
     all_records = []   # list of dictionaries → becomes DataFrame
     all_summaries = [] # one for every epoch, one summarizing over a run.
+
+    network.buildModel()
     
     for run in range(1, runs + 1):
+        # Delete the existing TensorFlow environment so we can compile
+        # new models without getting bogged down.
+        K.clear_session()
+
         print(f"\n===== Starting run {run}/{runs} =====")
 
         # Optional reproducibility
         if seed is not None:
             tf.keras.utils.set_random_seed(seed + run)
 
-        # Build a fresh model
-        network.buildModel()
-        print(network.model.name)
-        model = network.model
+        # Build the model, cloning if it is not the first one. This
+        # allows us to safely interate with the same Sequential model.
+        if run == 1:
+            model = network.model
+        else:
+            model = tf.keras.models.clone_model(model)
+        # Show the model, including the name.
         model.summary()
-        
+ 
         # Compile the model
         model.compile(
             loss="categorical_crossentropy",
